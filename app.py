@@ -8,7 +8,9 @@ import streamlit as st
 
 st.set_page_config(page_title="Lobinasyon", page_icon="⚽", layout="wide")
 
-DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# gw*.json dosyalari data/ altinda da olabilir, app.py ile ayni klasorde de
+SEARCH_DIRS = [os.path.join(BASE_DIR, "data"), BASE_DIR, os.getcwd()]
 CARD_LABEL = {
     "tum_takim": "Tüm Takım Sahaya",
     "dort_dortluk": "Dört Dörtlük (x4)",
@@ -23,10 +25,15 @@ PER_TYPE = 2
 
 @st.cache_data
 def load_weeks():
+    paths = {}
+    for d in SEARCH_DIRS:
+        for path in glob.glob(os.path.join(d, "gw*.json")):
+            paths.setdefault(os.path.basename(path), path)
     weeks = []
-    for path in sorted(glob.glob(os.path.join(DATA_DIR, "gw*.json"))):
-        with open(path, encoding="utf-8") as f:
+    for name in sorted(paths):
+        with open(paths[name], encoding="utf-8") as f:
             weeks.append(json.load(f))
+    weeks.sort(key=lambda w: w["week"])
     return weeks
 
 
@@ -112,7 +119,17 @@ def card_stock(weeks):
 
 weeks = load_weeks()
 if not weeks:
-    st.error("data/ klasöründe gw*.json bulunamadı.")
+    st.error("gw*.json dosyası bulunamadı.")
+    st.write("Şu klasörlere bakıldı:")
+    for d in SEARCH_DIRS:
+        try:
+            found = [f for f in sorted(os.listdir(d)) if f.startswith("gw")]
+        except OSError:
+            found = None
+        st.write(f"- `{d}` → " + ("klasör yok" if found is None
+                 else ", ".join(found) if found else "gw dosyası yok"))
+    st.info("Dosya adları `gw01.json`, `gw02.json` biçiminde olmalı. "
+            "app.py ile aynı klasöre ya da yanındaki `data/` klasörüne koy.")
     st.stop()
 
 last = weeks[-1]["week"]
