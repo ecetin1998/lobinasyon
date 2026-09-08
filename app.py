@@ -71,6 +71,10 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif}
 .tbl tr:hover td{background:#161d4d}
 .tbl th.on{color:#4ade9f}
 .of{color:#6b74a8;font-size:11px}
+[class^=pz-]{display:inline-block;padding:2px 6px;border-radius:6px;font-size:10px;font-weight:800}
+.pz-KL{background:#4a3a12;color:#ffd76a}.pz-DEF{background:#183166;color:#8fb8ff}
+.pz-OS{background:#14432f;color:#5ef0aa}.pz-FOR{background:#4a1f24;color:#ff8f8f}
+.pz-NA{background:#252a5e;color:#7d89c9}
 .rk{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;
  border-radius:8px;background:#1d2560;color:#98a4e0;font-size:12px;font-weight:800}
 .rk.g{background:#c9a227;color:#221a00}.rk.s{background:#9aa6b5;color:#15181d}
@@ -162,10 +166,10 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif}
  .t-std td:nth-child(n+5):nth-child(-n+8){display:none}
 
  /* oyuncular: secim, takim, en iyi, bosa, bar gizle */
- .t-pl th:nth-child(6),.t-pl td:nth-child(6),
- .t-pl th:nth-child(8),.t-pl td:nth-child(8),
+ .t-pl th:nth-child(7),.t-pl td:nth-child(7),
  .t-pl th:nth-child(9),.t-pl td:nth-child(9),
- .t-pl th:nth-child(11),.t-pl td:nth-child(11){display:none}
+ .t-pl th:nth-child(10),.t-pl td:nth-child(10),
+ .t-pl th:nth-child(12),.t-pl td:nth-child(12){display:none}
 
  .t-card{min-width:520px}
  .t-res td{font-size:12.5px;padding:8px 4px}
@@ -263,8 +267,7 @@ def md(html: str):
 md(CSS)  # bos satirlar md() icinde temizleniyor
 
 
-@st.cache_data
-def load_positions():
+def load_positions():   # cache YOK: dosya sonradan eklenince hemen gorunsun
     """Ortak pozisyon sozlugu: {"Osimhen": "FOR", ...}"""
     for d in SEARCH_DIRS:
         fp = os.path.join(d, "positions.json")
@@ -318,7 +321,7 @@ def build_table(weeks, upto=None):
 
 
 def player_stats(weeks):
-    pl = defaultdict(lambda: dict(name="", club="", sec=0, xi=0, cap=0, katki=0,
+    pl = defaultdict(lambda: dict(name="", club="", pos="", sec=0, xi=0, cap=0, katki=0,
                                   bosa=0, best=0, teams=set(),
                                   by=defaultdict(lambda: {"w": [], "c": 0, "cw": set()})))
     for w in weeks:
@@ -327,6 +330,7 @@ def player_stats(weeks):
             for p in sq["xi"]:
                 d = pl[(p["name"], p["club"])]
                 d["name"], d["club"] = p["name"], p["club"]
+                d["pos"] = d["pos"] or pos_of(p)
                 d["sec"] += 1; d["xi"] += 1
                 d["teams"].add(tn); d["best"] = max(d["best"], p["points"])
                 d["katki"] += p["points"] * (m if p["name"] == sq["captain"] else 1)
@@ -338,6 +342,7 @@ def player_stats(weeks):
             for p in sq["bench"]:
                 d = pl[(p["name"], p["club"])]
                 d["name"], d["club"] = p["name"], p["club"]
+                d["pos"] = d["pos"] or pos_of(p)
                 d["sec"] += 1
                 d["teams"].add(tn); d["best"] = max(d["best"], p["points"])
                 d["by"][tn]["w"].append(w["week"])
@@ -349,6 +354,18 @@ def player_stats(weeks):
 
 
 POS_FILE.update(load_positions())
+
+
+def pos_warning():
+    """positions.json yoksa nerelere bakildigini soyler."""
+    st.warning("positions.json bulunamadı, pozisyonlar boş görünüyor.")
+    for d in SEARCH_DIRS:
+        try:
+            var = "positions.json" in os.listdir(d)
+        except OSError:
+            var = None
+        st.write(f"- `{d}` → " + ("klasör yok" if var is None
+                                  else "VAR (okunamadı?)" if var else "yok"))
 weeks = load_weeks()
 if not weeks:
     st.error("gw*.json dosyası bulunamadı.")
@@ -461,13 +478,16 @@ with t1:
 
 with t2:
     slots = NT * len(weeks)
-    c1, c2 = st.columns([1, 2])
+    c1, c2, c3 = st.columns([1, 1, 2])
     club = c1.selectbox("Kulüp",
                         ["Hepsi"] + sorted({d["club"] for d in pl.values()}, key=tr_key))
-    q = c2.text_input("Oyuncu ara", "")
+    pos_f = c2.selectbox("Pozisyon", ["Hepsi"] + POS_ORDER,
+                         format_func=lambda x: POS_LABEL.get(x, x))
+    q = c3.text_input("Oyuncu ara", "")
 
     items = [(k, d) for k, d in pl.items()
              if (club == "Hepsi" or d["club"] == club)
+             and (pos_f == "Hepsi" or d["pos"] == pos_f)
              and q.lower() in d["name"].lower()]
 
     who = st.selectbox("Oyuncu detayı",
@@ -493,6 +513,8 @@ with t2:
         "İlk 11":     lambda n, d: d["xi"],
         "Oyuncu":     lambda n, d: tr_key(d["name"]),
         "Kulüp":      lambda n, d: (d["club"], -d["katki"]),
+        "Pozisyon":   lambda n, d: (POS_ORDER.index(d["pos"]) if d["pos"] in POS_ORDER
+                                    else 9, -d["katki"]),
     }
     s1, s2 = st.columns([2, 1])
     sort_opts = sorted(SORTS, key=tr_key)
@@ -502,7 +524,7 @@ with t2:
 
     asc = order == "Artan"
     key = SORTS[sort_by]
-    if sort_by in ("Oyuncu", "Kulüp"):
+    if sort_by in ("Oyuncu", "Kulüp", "Pozisyon"):
         items.sort(key=lambda kv: key(*kv), reverse=asc)
     else:
         items.sort(key=lambda kv: (key(*kv), kv[1]["katki"]), reverse=not asc)
@@ -512,6 +534,8 @@ with t2:
     def th(label, width=""):
         act = ' class="on"' if label == sort_by else ""
         return f"<th{act}{width}>{label}{arw if label == sort_by else ''}</th>"
+    if not POS_FILE:
+        pos_warning()
     PER_PAGE = 50
     total = len(items)
     pages = max(1, -(-total // PER_PAGE))
@@ -538,6 +562,7 @@ with t2:
                  f'<span class="tipbox"><u>{n}</u> — {len(d["by"])} takımda<br>{tip}</span>'
                  f'</span></td>'
                  f'<td>{d["club"]}</td>'
+                 f'<td><span class="pz-{d["pos"] or "NA"}">{d["pos"] or "—"}</span></td>'
                  f'<td><b>{d["sec"]}</b><span class="of">/{slots}</span></td><td>%{pct}</td>'
                  f'<td>{len(d["teams"])}<span class="of">/{NT}</span></td>'
                  f'<td>{d["cap"] or ""}</td>'
@@ -545,7 +570,7 @@ with t2:
                  f'<td class="pz">{d["katki"]}</td>'
                  f'<td style="width:110px"><div class="bar">'
                  f'<i style="width:{max(3, round(100*d["katki"]/mx))}%"></i></div></td></tr>')
-    heads = ("<th>#</th>" + th("Oyuncu") + th("Kulüp") + th("Seçim") + th("Oran")
+    heads = ("<th>#</th>" + th("Oyuncu") + th("Kulüp") + th("Pozisyon") + th("Seçim") + th("Oran")
              + th("Kaç takım") + th("Kaptanlık") + th("En iyi") + th("Boşa")
              + th("Katkı") + "<th></th>")
     md(f'<div class="scroll"><table class="tbl t-pl"><tr>{heads}</tr>{rows}</table></div>')
@@ -589,6 +614,8 @@ with t3:
                     f'<div class="p">{p["points"]}</div><div class="n">{p["name"]}</div>'
                     f'<div class="c">{pos_of(p) + " · " if pos_of(p) else ""}{p["club"]}</div></div>')
 
+        if not POS_FILE:
+            pos_warning()
         lines = formation(sq["xi"])
         has_pos = all(pos_of(p) for p in sq["xi"])
         shape = ("-".join(str(len(ln)) for ln in lines[1:])
