@@ -69,6 +69,8 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif}
  color:#dfe4ff;font-variant-numeric:tabular-nums}
 .tbl td:nth-child(-n+3){text-align:left}
 .tbl tr:hover td{background:#161d4d}
+.tbl th.on{color:#4ade9f}
+.of{color:#6b74a8;font-size:11px}
 .rk{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;
  border-radius:8px;background:#1d2560;color:#98a4e0;font-size:12px;font-weight:800}
 .rk.g{background:#c9a227;color:#221a00}.rk.s{background:#9aa6b5;color:#15181d}
@@ -110,7 +112,23 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif}
  font-size:13px;padding:8px 16px}
 .stTabs [aria-selected="true"]{color:#4ade9f;border-bottom:2px solid #4ade9f}
 
-.scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.scroll{width:100%;overflow-x:visible}
+.tip{position:relative;cursor:help;border-bottom:1px dotted #4a5599}
+.tipbox{visibility:hidden;opacity:0;position:absolute;left:0;top:150%;z-index:99;
+ background:#0d1236;border:1px solid #3a4590;border-radius:10px;padding:9px 11px;
+ min-width:210px;max-width:290px;box-shadow:0 8px 22px #0009;
+ font-size:11.5px;font-weight:400;color:#c9d2ff;line-height:1.75;
+ transition:opacity .12s;pointer-events:none;white-space:normal}
+.tipbox b{color:#fff;font-weight:700}
+.tipbox i{color:#8e9ad4;font-style:normal;font-size:10.5px}
+.tipbox u{color:#4ade9f;text-decoration:none;font-weight:800}
+.tip:hover .tipbox{visibility:visible;opacity:1}
+.tbl tr:nth-last-child(-n+4) .tipbox{top:auto;bottom:150%}
+.owns{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:6px}
+.own{background:#161d4d;border:1px solid #2b3480;border-radius:10px;padding:6px 10px;
+ font-size:12px;color:#dfe4ff;font-weight:600}
+.own.cap{border-color:#12b26b;background:#12331f}
+.own i{display:block;font-style:normal;font-size:10px;color:#8e9ad4;font-weight:400}
 
 @media (max-width:760px){
  .block-container{padding-left:.7rem;padding-right:.7rem;padding-top:.8rem}
@@ -132,16 +150,18 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif}
  .strip .l{font-size:9px;letter-spacing:.6px}
  .strip .n{font-size:10px}
 
+ .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+ .tipbox{display:none}
+ .tip{border-bottom:none}
  .tbl{font-size:12.5px}
  .tbl th,.tbl td{padding:8px 5px}
  .rk{width:21px;height:21px;font-size:11px;border-radius:7px}
 
  /* puan durumu: O G B M A Y gizle, form + AV + P kalsin */
- .t-std th:nth-child(n+5):nth-child(-n+10),
- .t-std td:nth-child(n+5):nth-child(-n+10){display:none}
+ .t-std th:nth-child(n+5):nth-child(-n+8),
+ .t-std td:nth-child(n+5):nth-child(-n+8){display:none}
 
  /* oyuncular: secim, takim, en iyi, bosa, bar gizle */
- .t-pl th:nth-child(4),.t-pl td:nth-child(4),
  .t-pl th:nth-child(6),.t-pl td:nth-child(6),
  .t-pl th:nth-child(8),.t-pl td:nth-child(8),
  .t-pl th:nth-child(9),.t-pl td:nth-child(9),
@@ -235,7 +255,8 @@ def build_table(weeks, upto=None):
 
 def player_stats(weeks):
     pl = defaultdict(lambda: dict(club="", sec=0, xi=0, cap=0, katki=0,
-                                  bosa=0, best=0, teams=set()))
+                                  bosa=0, best=0, teams=set(),
+                                  by=defaultdict(lambda: {"w": [], "c": 0})))
     for w in weeks:
         for tn, sq in w["teams"].items():
             m, cb = sq["multiplier"], sq["card"] == "tum_takim"
@@ -243,11 +264,14 @@ def player_stats(weeks):
                 d = pl[p["name"]]; d["club"] = p["club"]; d["sec"] += 1; d["xi"] += 1
                 d["teams"].add(tn); d["best"] = max(d["best"], p["points"])
                 d["katki"] += p["points"] * (m if p["name"] == sq["captain"] else 1)
+                d["by"][tn]["w"].append(w["week"])
                 if p["name"] == sq["captain"]:
                     d["cap"] += 1
+                    d["by"][tn]["c"] += 1
             for p in sq["bench"]:
                 d = pl[p["name"]]; d["club"] = p["club"]; d["sec"] += 1
                 d["teams"].add(tn); d["best"] = max(d["best"], p["points"])
+                d["by"][tn]["w"].append(w["week"])
                 if cb:
                     d["katki"] += p["points"]
                 else:
@@ -271,6 +295,7 @@ NT = max(len(w["teams"]) for w in weeks)
 table = build_table(weeks)
 prev_rank = ({r["t"]: i for i, r in enumerate(build_table(weeks, LAST - 1))}
              if len(weeks) > 1 else {})
+rank_of = {r['t']: i for i, r in enumerate(table)}
 pl = player_stats(weeks)
 
 md(f"""<div class="hero"><h1>Lobinasyon</h1>
@@ -310,8 +335,32 @@ md(f"""<div class="strip">
 t1, t2, t3, t4, t5 = st.tabs(["PUAN DURUMU", "OYUNCULAR", "TAKIM DETAYI", "KARTLAR", "SONUÇLAR"])
 
 with t1:
+    STD_SORTS = {
+        "Puan":        lambda r: (r["P"], r["AV"], r["A"]),
+        "Averaj":      lambda r: (r["AV"], r["A"]),
+        "Attığı":      lambda r: (r["A"], r["AV"]),
+        "Yediği":      lambda r: (r["Y"], -r["AV"]),
+        "Galibiyet":   lambda r: (r["G"], r["AV"]),
+        "Beraberlik":  lambda r: (r["B"], r["AV"]),
+        "Mağlubiyet":  lambda r: (r["M"], -r["AV"]),
+        "Form":        lambda r: (sum({"W": 3, "D": 1, "L": 0}[c] for c in r["form"][-5:]),
+                                  r["AV"]),
+        "Takım":       lambda r: r["t"].lower(),
+    }
+    k1, k2 = st.columns([2, 1])
+    std_by = k1.selectbox("Sırala", list(STD_SORTS), index=0, key="stdsort")
+    std_ord = k2.radio("Yön", ["Azalan", "Artan"], horizontal=True, key="stdord")
+    std_asc = std_ord == "Artan"
+    view = sorted(table, key=STD_SORTS[std_by], reverse=not std_asc)
+    st_arw = " ▲" if std_asc else " ▼"
+
+    def sth(label):
+        act = ' class="on"' if label == std_by else ""
+        return f"<th{act}>{label}{st_arw if label == std_by else ''}</th>"
+
     rows = ""
-    for i, r in enumerate(table):
+    for r in view:
+        i = rank_of[r["t"]]
         cls = ["g", "s", "b"][i] if i < 3 else ""
         d = prev_rank.get(r["t"], i) - i
         mv = (f'<span class="up">▲{d}</span>' if d > 0 else
@@ -323,36 +372,88 @@ with t1:
                  f'<td>{r["O"]}</td><td>{r["G"]}</td><td>{r["B"]}</td><td>{r["M"]}</td>'
                  f'<td>{r["A"]}</td><td>{r["Y"]}</td><td>{r["AV"]:+d}</td>'
                  f'<td class="pz">{r["P"]}</td></tr>')
-    md('<div class="scroll"><table class="tbl t-std"><tr><th>#</th><th>Takım</th><th></th><th>Form</th>'
-                '<th>O</th><th>G</th><th>B</th><th>M</th><th>A</th><th>Y</th>'
-                f'<th>AV</th><th>P</th></tr>{rows}</table></div>')
-    st.caption("Form son 5 maç, soldan sağa eskiden yeniye. ▲▼ bir önceki haftaya göre.")
+    heads = ("<th>#</th>" + sth("Takım") + "<th></th>" + sth("Form")
+             + "<th>O</th>" + sth("Galibiyet") + sth("Beraberlik") + sth("Mağlubiyet")
+             + sth("Attığı") + sth("Yediği") + sth("Averaj") + sth("Puan"))
+    md(f'<div class="scroll"><table class="tbl t-std"><tr>{heads}</tr>{rows}</table></div>')
+    st.caption("# sütunu her zaman gerçek lig sırasını gösterir, sıralamayı değiştirsen de "
+               "değişmez. Form son 5 maç, soldan sağa eskiden yeniye. "
+               "▲▼ bir önceki maç haftasına göre.")
 
 with t2:
     slots = NT * len(weeks)
-    c1, c2, c3 = st.columns([1, 1, 2])
-    ms = c1.slider("En az seçilme", 1, 20, 1)
-    club = c2.selectbox("Kulüp", ["Hepsi"] + sorted({d["club"] for d in pl.values()}))
-    q = c3.text_input("Oyuncu ara", "")
+    c1, c2 = st.columns([1, 2])
+    club = c1.selectbox("Kulüp", ["Hepsi"] + sorted({d["club"] for d in pl.values()}))
+    q = c2.text_input("Oyuncu ara", "")
+
     items = [(n, d) for n, d in pl.items()
-             if d["sec"] >= ms and (club == "Hepsi" or d["club"] == club)
-             and q.lower() in n.lower()]
-    items.sort(key=lambda kv: -kv[1]["katki"])
+             if (club == "Hepsi" or d["club"] == club) and q.lower() in n.lower()]
+
+    who = st.selectbox("Oyuncu detayı", ["—"] + [n for n, _ in items], key="who")
+    if who != "—":
+        d = pl[who]
+        chips = "".join(
+            f'<span class="own{" cap" if v["c"] else ""}">{t}'
+            f'<i>MH{",".join(str(x) for x in sorted(set(v["w"])))}'
+            f'{" · C×" + str(v["c"]) if v["c"] else ""}</i></span>'
+            for t, v in sorted(d["by"].items(), key=lambda kv: -len(kv[1]["w"])))
+        md(f'<div class="sec">{who} — {len(d["by"])}/{NT} takımda</div>'
+           f'<div class="owns">{chips}</div>')
+
+    SORTS = {
+        "Katkı":      lambda n, d: d["katki"],
+        "Seçim":      lambda n, d: d["sec"],
+        "Oran":       lambda n, d: d["sec"],
+        "Kaç takım":  lambda n, d: len(d["teams"]),
+        "Kaptanlık":  lambda n, d: d["cap"],
+        "En iyi":     lambda n, d: d["best"],
+        "Boşa":       lambda n, d: d["bosa"],
+        "İlk 11":     lambda n, d: d["xi"],
+        "Oyuncu":     lambda n, d: n.lower(),
+        "Kulüp":      lambda n, d: (d["club"], -d["katki"]),
+    }
+    s1, s2 = st.columns([2, 1])
+    sort_by = s1.selectbox("Sırala", list(SORTS), index=0)
+    order = s2.radio("Yön", ["Azalan", "Artan"], horizontal=True, label_visibility="visible")
+
+    asc = order == "Artan"
+    key = SORTS[sort_by]
+    if sort_by in ("Oyuncu", "Kulüp"):
+        items.sort(key=lambda kv: key(*kv), reverse=asc)
+    else:
+        items.sort(key=lambda kv: (key(*kv), kv[1]["katki"]), reverse=not asc)
     mx = max([d["katki"] for _, d in items], default=1) or 1
+    arw = " ▲" if asc else " ▼"
+
+    def th(label, width=""):
+        act = ' class="on"' if label == sort_by else ""
+        return f"<th{act}{width}>{label}{arw if label == sort_by else ''}</th>"
     rows = ""
     for i, (n, d) in enumerate(items[:60], 1):
         pct = round(100 * d["sec"] / slots)
-        rows += (f'<tr><td><span class="rk">{i}</span></td><td class="tm">{n}</td>'
-                 f'<td>{d["club"]}</td><td>{d["sec"]}/{slots}</td><td>%{pct}</td>'
-                 f'<td>{len(d["teams"])}/{NT}</td><td>{d["cap"]}</td>'
+        tip = "".join(
+            f'<b>{t}</b> <i>MH{",".join(str(x) for x in sorted(set(v["w"])))}'
+            f'{" · C×" + str(v["c"]) if v["c"] else ""}</i><br>'
+            for t, v in sorted(d["by"].items(), key=lambda kv: -len(kv[1]["w"])))
+        rows += (f'<tr><td><span class="rk">{i}</span></td>'
+                 f'<td class="tm"><span class="tip">{n}'
+                 f'<span class="tipbox"><u>{n}</u> — {len(d["by"])} takımda<br>{tip}</span>'
+                 f'</span></td>'
+                 f'<td>{d["club"]}</td>'
+                 f'<td><b>{d["sec"]}</b><span class="of">/{slots}</span></td><td>%{pct}</td>'
+                 f'<td>{len(d["teams"])}<span class="of">/{NT}</span></td>'
+                 f'<td>{d["cap"] or ""}</td>'
                  f'<td>{d["best"]}</td><td>{d["bosa"] or ""}</td>'
                  f'<td class="pz">{d["katki"]}</td>'
                  f'<td style="width:110px"><div class="bar">'
                  f'<i style="width:{max(3, round(100*d["katki"]/mx))}%"></i></div></td></tr>')
-    md('<div class="scroll"><table class="tbl t-pl"><tr><th>#</th><th>Oyuncu</th><th>Kulüp</th>'
-                '<th>Seçim</th><th>Oran</th><th>Takım</th><th>C</th><th>En iyi</th>'
-                f'<th>Boşa</th><th>Katkı</th><th></th></tr>{rows}</table></div>')
-    st.caption(f"Seçim = {slots} kadro slotunun kaçında yer aldığı "
+    heads = ("<th>#</th>" + th("Oyuncu") + th("Kulüp") + th("Seçim") + th("Oran")
+             + th("Kaç takım") + th("Kaptanlık") + th("En iyi") + th("Boşa")
+             + th("Katkı") + "<th></th>")
+    md(f'<div class="scroll"><table class="tbl t-pl"><tr>{heads}</tr>{rows}</table></div>')
+    st.caption("Oyuncu adının üstüne gelince hangi takımlarda olduğu çıkar; "
+               "telefonda yukarıdaki detay kutusunu kullan. "
+               f"Seçim = {slots} kadro slotunun kaçında yer aldığı "
                f"({NT} takım × {len(weeks)} hafta). Katkı kaptan çarpanı dahil. "
                "Boşa = yedekte kalan puan.")
 
