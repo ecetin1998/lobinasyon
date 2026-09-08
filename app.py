@@ -391,9 +391,14 @@ for _k in pl:
 
 
 def label_of(key) -> str:
-    """Ayni isim birden fazla kulupte varsa etikete kulubu ekler."""
+    """Tabloda/başlıkta görünen ad: sade isim (kulüp ayrı sütunda)."""
+    return key[0]
+
+
+def picker_label(key) -> str:
+    """Açılır listede ayrım gerekiyorsa kulübü de yazar (aynı isimli oyuncular)."""
     name, club = key
-    return f"{name} ({club})" if _name_count[name] > 1 else name
+    return f"{name} · {club}" if _name_count[name] > 1 else name
 
 md(f"""<div class="hero"><h1>Lobinasyon</h1>
 <p>TFF FANTASY MİNİ LİG &nbsp;·&nbsp; MAÇ HAFTASI {LAST} &nbsp;·&nbsp; {NT} TAKIM</p></div>""")
@@ -492,15 +497,19 @@ with t2:
              and q.lower() in d["name"].lower()]
 
     who = st.selectbox("Oyuncu detayı",
-                       ["—"] + sorted((label_of(k) for k, _ in items), key=tr_key),
+                       ["—"] + sorted((k for k, _ in items),
+                                      key=lambda k: tr_key(picker_label(k))),
+                       format_func=lambda k: "—" if k == "—" else picker_label(k),
                        key="who")
     if who != "—":
-        d = next(v for k, v in pl.items() if label_of(k) == who)
+        d = pl[who]
         chips = "".join(
             f'<span class="own{" cap" if v["c"] else ""}">{t}'
             f'<i>{weeks_label(v)}</i></span>'
             for t, v in sorted(d["by"].items(), key=lambda kv: tr_key(kv[0])))
-        md(f'<div class="sec">{who} — {len(d["by"])}/{NT} takımda</div>'
+        md(f'<div class="sec">{d["name"]} <span class="of">{d["club"]}'
+           f'{" · " + d["pos"] if d["pos"] else ""}</span> — '
+           f'{len(d["by"])}/{NT} takımda</div>'
            f'<div class="owns">{chips}</div>')
 
     SORTS = {
