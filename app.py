@@ -106,6 +106,7 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif}
 .pl .n{font-size:11px;font-weight:700;color:#20264f;white-space:nowrap;overflow:hidden;
  text-overflow:ellipsis}
 .pl .c{font-size:9.5px;color:#6b74a8}
+.pl .mx{font-size:9px;font-weight:700;color:#12b26b;margin-left:3px;vertical-align:super}
 .pl.dim{opacity:.6}
 .badge{position:absolute;top:-7px;left:-7px;width:19px;height:19px;border-radius:50%;
  font-size:10px;font-weight:800;line-height:19px;color:#fff}
@@ -604,14 +605,24 @@ with t3:
         <div class="s"><div class="l">Nostradamus</div><div class="v">{sq['nostradamus']}</div></div>
         </div>""")
 
+        mult = sq["multiplier"]
+
         def chip(p, dim=False):
-            b = ""
+            """Kartta oyuncunun ekrana yansiyan puani gosterilir.
+
+            Kaptan icin taban puan carpanla carpilir (x2/x3/x4); kucuk yazi
+            olarak taban deger ve carpan da yazilir.
+            """
+            b, extra = "", ""
             if p["name"] == sq["captain"]:
                 b = '<div class="badge bc">C</div>'
+                if mult > 1:
+                    extra = f'<span class="mx">{p["points"]}×{mult}</span>'
             elif p["name"] == sq["vice"]:
                 b = '<div class="badge bv">V</div>'
+            eff = p["points"] * mult if p["name"] == sq["captain"] else p["points"]
             return (f'<div class="pl{" dim" if dim else ""}">{b}'
-                    f'<div class="p">{p["points"]}</div><div class="n">{p["name"]}</div>'
+                    f'<div class="p">{eff}{extra}</div><div class="n">{p["name"]}</div>'
                     f'<div class="c">{pos_of(p) + " · " if pos_of(p) else ""}{p["club"]}</div></div>')
 
         if not POS_FILE:
