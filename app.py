@@ -210,6 +210,19 @@ def tr_key(text: str):
     return [_TR_ORDER.get(ch, ord(ch) + 1000) // 2 for ch in str(text)]
 
 
+
+def weeks_label(v) -> str:
+    """MH1 (C), 2, 3 (C) · C×2 seklinde hafta listesi uretir."""
+    parts = []
+    for i, wk in enumerate(sorted(set(v["w"]))):
+        cap = " (C)" if wk in v["cw"] else ""
+        parts.append((f"MH{wk}" if i == 0 else str(wk)) + cap)
+    out = ", ".join(parts)
+    if v["c"] > 1:
+        out += f" · C×{v['c']}"
+    return out
+
+
 def md(html: str):
     """HTML'i ham metne dusurmeden basar.
 
@@ -270,7 +283,7 @@ def build_table(weeks, upto=None):
 def player_stats(weeks):
     pl = defaultdict(lambda: dict(club="", sec=0, xi=0, cap=0, katki=0,
                                   bosa=0, best=0, teams=set(),
-                                  by=defaultdict(lambda: {"w": [], "c": 0})))
+                                  by=defaultdict(lambda: {"w": [], "c": 0, "cw": set()})))
     for w in weeks:
         for tn, sq in w["teams"].items():
             m, cb = sq["multiplier"], sq["card"] == "tum_takim"
@@ -282,6 +295,7 @@ def player_stats(weeks):
                 if p["name"] == sq["captain"]:
                     d["cap"] += 1
                     d["by"][tn]["c"] += 1
+                    d["by"][tn]["cw"].add(w["week"])
             for p in sq["bench"]:
                 d = pl[p["name"]]; d["club"] = p["club"]; d["sec"] += 1
                 d["teams"].add(tn); d["best"] = max(d["best"], p["points"])
@@ -392,9 +406,6 @@ with t1:
              + "<th>O</th>" + sth("Galibiyet") + sth("Beraberlik") + sth("Mağlubiyet")
              + sth("Attığı") + sth("Yediği") + sth("Averaj") + sth("Puan"))
     md(f'<div class="scroll"><table class="tbl t-std"><tr>{heads}</tr>{rows}</table></div>')
-    st.caption("# sütunu her zaman gerçek lig sırasını gösterir, sıralamayı değiştirsen de "
-               "değişmez. Form son 5 maç, soldan sağa eskiden yeniye. "
-               "▲▼ bir önceki maç haftasına göre.")
 
 with t2:
     slots = NT * len(weeks)
@@ -413,9 +424,8 @@ with t2:
         d = pl[who]
         chips = "".join(
             f'<span class="own{" cap" if v["c"] else ""}">{t}'
-            f'<i>MH{",".join(str(x) for x in sorted(set(v["w"])))}'
-            f'{" · C×" + str(v["c"]) if v["c"] else ""}</i></span>'
-            for t, v in sorted(d["by"].items(), key=lambda kv: -len(kv[1]["w"])))
+            f'<i>{weeks_label(v)}</i></span>'
+            for t, v in sorted(d["by"].items(), key=lambda kv: tr_key(kv[0])))
         md(f'<div class="sec">{who} — {len(d["by"])}/{NT} takımda</div>'
            f'<div class="owns">{chips}</div>')
 
@@ -453,9 +463,8 @@ with t2:
     for i, (n, d) in enumerate(items[:60], 1):
         pct = round(100 * d["sec"] / slots)
         tip = "".join(
-            f'<b>{t}</b> <i>MH{",".join(str(x) for x in sorted(set(v["w"])))}'
-            f'{" · C×" + str(v["c"]) if v["c"] else ""}</i><br>'
-            for t, v in sorted(d["by"].items(), key=lambda kv: -len(kv[1]["w"])))
+            f'<b>{t}</b> <i>{weeks_label(v)}</i><br>'
+            for t, v in sorted(d["by"].items(), key=lambda kv: tr_key(kv[0])))
         rows += (f'<tr><td><span class="rk">{i}</span></td>'
                  f'<td class="tm"><span class="tip">{n}'
                  f'<span class="tipbox"><u>{n}</u> — {len(d["by"])} takımda<br>{tip}</span>'
