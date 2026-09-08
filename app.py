@@ -223,6 +223,32 @@ def weeks_label(v) -> str:
     return out
 
 
+
+# Pozisyon kodlari: KL kaleci, DEF defans, OS orta saha, FOR forvet
+POS_ORDER = ["KL", "DEF", "OS", "FOR"]
+POS_LABEL = {"KL": "Kaleci", "DEF": "Defans", "OS": "Orta saha", "FOR": "Forvet"}
+POS_FILE = {}   # oyuncu -> pozisyon; positions.json varsa doldurulur
+
+
+def pos_of(p) -> str:
+    """Once oyuncunun kendi 'pos' alani, sonra positions.json.
+
+    positions.json anahtari "Oyuncu|KULUP" (ayni isimli farkli oyuncular icin);
+    bulunamazsa sade isimle de bakilir.
+    """
+    return (p.get("pos")
+            or POS_FILE.get(f'{p["name"]}|{p["club"]}')
+            or POS_FILE.get(p["name"], ""))
+
+
+def formation(xi):
+    """Ilk 11'i pozisyona gore satirlara boler; pozisyon yoksa kadro sirasina duser."""
+    if not all(pos_of(p) for p in xi):
+        return [xi[:1], xi[1:5], xi[5:9], xi[9:]] if len(xi) == 11 else [xi]
+    lines = [[p for p in xi if pos_of(p) == k] for k in POS_ORDER]
+    return [ln for ln in lines if ln]
+
+
 def md(html: str):
     """HTML'i ham metne dusurmeden basar.
 
@@ -235,6 +261,17 @@ def md(html: str):
 
 
 md(CSS)  # bos satirlar md() icinde temizleniyor
+
+
+@st.cache_data
+def load_positions():
+    """Ortak pozisyon sozlugu: {"Osimhen": "FOR", ...}"""
+    for d in SEARCH_DIRS:
+        fp = os.path.join(d, "positions.json")
+        if os.path.exists(fp):
+            with open(fp, encoding="utf-8") as f:
+                return json.load(f)
+    return {}
 
 
 @st.cache_data
@@ -281,14 +318,16 @@ def build_table(weeks, upto=None):
 
 
 def player_stats(weeks):
-    pl = defaultdict(lambda: dict(club="", sec=0, xi=0, cap=0, katki=0,
+    pl = defaultdict(lambda: dict(name="", club="", sec=0, xi=0, cap=0, katki=0,
                                   bosa=0, best=0, teams=set(),
                                   by=defaultdict(lambda: {"w": [], "c": 0, "cw": set()})))
     for w in weeks:
         for tn, sq in w["teams"].items():
             m, cb = sq["multiplier"], sq["card"] == "tum_takim"
             for p in sq["xi"]:
-                d = pl[p["name"]]; d["club"] = p["club"]; d["sec"] += 1; d["xi"] += 1
+                d = pl[(p["name"], p["club"])]
+                d["name"], d["club"] = p["name"], p["club"]
+                d["sec"] += 1; d["xi"] += 1
                 d["teams"].add(tn); d["best"] = max(d["best"], p["points"])
                 d["katki"] += p["points"] * (m if p["name"] == sq["captain"] else 1)
                 d["by"][tn]["w"].append(w["week"])
@@ -297,7 +336,9 @@ def player_stats(weeks):
                     d["by"][tn]["c"] += 1
                     d["by"][tn]["cw"].add(w["week"])
             for p in sq["bench"]:
-                d = pl[p["name"]]; d["club"] = p["club"]; d["sec"] += 1
+                d = pl[(p["name"], p["club"])]
+                d["name"], d["club"] = p["name"], p["club"]
+                d["sec"] += 1
                 d["teams"].add(tn); d["best"] = max(d["best"], p["points"])
                 d["by"][tn]["w"].append(w["week"])
                 if cb:
@@ -307,6 +348,7 @@ def player_stats(weeks):
     return pl
 
 
+POS_FILE.update(load_positions())
 weeks = load_weeks()
 if not weeks:
     st.error("gw*.json dosyası bulunamadı.")
@@ -325,6 +367,15 @@ prev_rank = ({r["t"]: i for i, r in enumerate(build_table(weeks, LAST - 1))}
              if len(weeks) > 1 else {})
 rank_of = {r['t']: i for i, r in enumerate(table)}
 pl = player_stats(weeks)
+_name_count = defaultdict(int)
+for _k in pl:
+    _name_count[_k[0]] += 1
+
+
+def label_of(key) -> str:
+    """Ayni isim birden fazla kulupte varsa etikete kulubu ekler."""
+    name, club = key
+    return f"{name} ({club})" if _name_count[name] > 1 else name
 
 md(f"""<div class="hero"><h1>Lobinasyon</h1>
 <p>TFF FANTASY MİNİ LİG &nbsp;·&nbsp; MAÇ HAFTASI {LAST} &nbsp;·&nbsp; {NT} TAKIM</p></div>""")
@@ -341,6 +392,7 @@ week_scores = {t: sq["mh"] for t, sq in weeks[-1]["teams"].items()}
 best_t = max(week_scores, key=week_scores.get)
 season_best = max((sq["mh"], t, w["week"]) for w in weeks for t, sq in w["teams"].items())
 top_pl = max(pl.items(), key=lambda kv: kv[1]["katki"])
+top_pl_name = label_of(top_pl[0])
 cap_hit = sum(1 for w in weeks for sq in w["teams"].values()
               if next((p["points"] for p in sq["xi"] if p["name"] == sq["captain"]), 0)
               == max(p["points"] for p in sq["xi"]))
@@ -352,7 +404,7 @@ md(f"""<div class="strip">
 <div class="n">{week_scores[best_t]} puan · MH{LAST}</div></div>
 <div class="s"><div class="l">Sezon rekoru</div><div class="v">{season_best[0]}</div>
 <div class="n">{season_best[1]} · MH{season_best[2]}</div></div>
-<div class="s"><div class="l">Kral</div><div class="v">{top_pl[0]}</div>
+<div class="s"><div class="l">Kral</div><div class="v">{top_pl_name}</div>
 <div class="n">{top_pl[1]['katki']} puan üretti</div></div>
 <div class="s"><div class="l">Kaptan isabeti</div><div class="v">{cap_hit}/{cap_tot}</div>
 <div class="n">%{round(100*cap_hit/cap_tot)} doğru seçim</div></div>
@@ -414,14 +466,15 @@ with t2:
                         ["Hepsi"] + sorted({d["club"] for d in pl.values()}, key=tr_key))
     q = c2.text_input("Oyuncu ara", "")
 
-    items = [(n, d) for n, d in pl.items()
-             if (club == "Hepsi" or d["club"] == club) and q.lower() in n.lower()]
+    items = [(k, d) for k, d in pl.items()
+             if (club == "Hepsi" or d["club"] == club)
+             and q.lower() in d["name"].lower()]
 
     who = st.selectbox("Oyuncu detayı",
-                       ["—"] + sorted((n for n, _ in items), key=tr_key),
+                       ["—"] + sorted((label_of(k) for k, _ in items), key=tr_key),
                        key="who")
     if who != "—":
-        d = pl[who]
+        d = next(v for k, v in pl.items() if label_of(k) == who)
         chips = "".join(
             f'<span class="own{" cap" if v["c"] else ""}">{t}'
             f'<i>{weeks_label(v)}</i></span>'
@@ -438,7 +491,7 @@ with t2:
         "En iyi":     lambda n, d: d["best"],
         "Boşa":       lambda n, d: d["bosa"],
         "İlk 11":     lambda n, d: d["xi"],
-        "Oyuncu":     lambda n, d: n.lower(),
+        "Oyuncu":     lambda n, d: tr_key(d["name"]),
         "Kulüp":      lambda n, d: (d["club"], -d["katki"]),
     }
     s1, s2 = st.columns([2, 1])
@@ -459,8 +512,23 @@ with t2:
     def th(label, width=""):
         act = ' class="on"' if label == sort_by else ""
         return f"<th{act}{width}>{label}{arw if label == sort_by else ''}</th>"
+    PER_PAGE = 50
+    total = len(items)
+    pages = max(1, -(-total // PER_PAGE))
+    if pages > 1:
+        pg = st.radio(f"Sayfa ({total} oyuncu)",
+                      list(range(1, pages + 1)),
+                      horizontal=True, key="plpage",
+                      format_func=lambda x: f"{(x-1)*PER_PAGE+1}-"
+                                            f"{min(x*PER_PAGE, total)}")
+    else:
+        pg = 1
+    start = (pg - 1) * PER_PAGE
+    page_items = items[start:start + PER_PAGE]
+
     rows = ""
-    for i, (n, d) in enumerate(items[:60], 1):
+    for i, (k, d) in enumerate(page_items, start + 1):
+        n = label_of(k)
         pct = round(100 * d["sec"] / slots)
         tip = "".join(
             f'<b>{t}</b> <i>{weeks_label(v)}</i><br>'
@@ -481,7 +549,8 @@ with t2:
              + th("Kaç takım") + th("Kaptanlık") + th("En iyi") + th("Boşa")
              + th("Katkı") + "<th></th>")
     md(f'<div class="scroll"><table class="tbl t-pl"><tr>{heads}</tr>{rows}</table></div>')
-    st.caption("Oyuncu adının üstüne gelince hangi takımlarda olduğu çıkar; "
+    st.caption(f"Listede en az bir kez seçilmiş {total} oyuncunun tamamı var. "
+               "Oyuncu adının üstüne gelince hangi takımlarda olduğu çıkar; "
                "telefonda yukarıdaki detay kutusunu kullan. "
                f"Seçim = {slots} kadro slotunun kaçında yer aldığı "
                f"({NT} takım × {len(weeks)} hafta). Katkı kaptan çarpanı dahil. "
@@ -518,13 +587,16 @@ with t3:
                 b = '<div class="badge bv">V</div>'
             return (f'<div class="pl{" dim" if dim else ""}">{b}'
                     f'<div class="p">{p["points"]}</div><div class="n">{p["name"]}</div>'
-                    f'<div class="c">{p["club"]}</div></div>')
+                    f'<div class="c">{pos_of(p) + " · " if pos_of(p) else ""}{p["club"]}</div></div>')
 
-        xi = sq["xi"]
-        lines = [xi[:1], xi[1:5], xi[5:9], xi[9:]] if len(xi) == 11 else [xi]
+        lines = formation(sq["xi"])
+        has_pos = all(pos_of(p) for p in sq["xi"])
+        shape = ("-".join(str(len(ln)) for ln in lines[1:])
+                 if has_pos and len(lines) > 1 else "")
         pitch = "".join(f'<div class="row">{"".join(chip(p) for p in ln)}</div>'
-                        for ln in lines if ln)
-        md(f'<div class="pitch">{pitch}</div>')
+                        for ln in lines)
+        md((f'<div class="sec">Diziliş {shape}</div>' if shape else '')
+           + f'<div class="pitch">{pitch}</div>')
         counted = sq["card"] == "tum_takim"
         md(f'<div class="sec">Yedekler {"— sayıldı" if counted else "— sayılmadı"}</div>')
         md(f'<div class="row">{"".join(chip(p, not counted) for p in sq["bench"])}</div>')
