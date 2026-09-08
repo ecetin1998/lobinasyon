@@ -176,7 +176,13 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif}
  text-transform:uppercase;margin:18px 0 8px}
 </style>
 """
-st.markdown(CSS, unsafe_allow_html=True)
+def md(html: str):
+    """HTML'i markdown'a kod blogu saydirmadan basar (satir basi bosluklarini kirpar)."""
+    st.markdown("\n".join(line.strip() for line in html.splitlines()),
+                unsafe_allow_html=True)
+
+
+md(CSS)
 
 
 @st.cache_data
@@ -262,9 +268,8 @@ prev_rank = ({r["t"]: i for i, r in enumerate(build_table(weeks, LAST - 1))}
              if len(weeks) > 1 else {})
 pl = player_stats(weeks)
 
-st.markdown(f"""<div class="hero"><h1>Lobinasyon</h1>
-<p>TFF FANTASY MİNİ LİG &nbsp;·&nbsp; MAÇ HAFTASI {LAST} &nbsp;·&nbsp; {NT} TAKIM</p></div>""",
-            unsafe_allow_html=True)
+md(f"""<div class="hero"><h1>Lobinasyon</h1>
+<p>TFF FANTASY MİNİ LİG &nbsp;·&nbsp; MAÇ HAFTASI {LAST} &nbsp;·&nbsp; {NT} TAKIM</p></div>""")
 
 medals = ["🥇", "🥈", "🥉"]
 pod = "".join(
@@ -272,7 +277,7 @@ pod = "".join(
     f'<div class="nm">{r["t"]}</div><div class="pts">{r["P"]}</div>'
     f'<div class="sub">{r["G"]}G {r["B"]}B {r["M"]}M · AV {r["AV"]:+d}</div></div>'
     for i, r in enumerate(table[:3]))
-st.markdown(f'<div class="pod">{pod}</div>', unsafe_allow_html=True)
+md(f'<div class="pod">{pod}</div>')
 
 week_scores = {t: sq["mh"] for t, sq in weeks[-1]["teams"].items()}
 best_t = max(week_scores, key=week_scores.get)
@@ -284,7 +289,7 @@ cap_hit = sum(1 for w in weeks for sq in w["teams"].values()
 cap_tot = sum(len(w["teams"]) for w in weeks)
 cards_used = sum(1 for w in weeks for sq in w["teams"].values() if sq["card"])
 
-st.markdown(f"""<div class="strip">
+md(f"""<div class="strip">
 <div class="s"><div class="l">Haftanın takımı</div><div class="v">{best_t}</div>
 <div class="n">{week_scores[best_t]} puan · MH{LAST}</div></div>
 <div class="s"><div class="l">Sezon rekoru</div><div class="v">{season_best[0]}</div>
@@ -295,7 +300,7 @@ st.markdown(f"""<div class="strip">
 <div class="n">%{round(100*cap_hit/cap_tot)} doğru seçim</div></div>
 <div class="s"><div class="l">Yakılan kart</div><div class="v">{cards_used}</div>
 <div class="n">{NT*PER_TYPE*len(CARD_KEYS)} hakkın içinden</div></div>
-</div>""", unsafe_allow_html=True)
+</div>""")
 
 t1, t2, t3, t4, t5 = st.tabs(["PUAN DURUMU", "OYUNCULAR", "TAKIM DETAYI", "KARTLAR", "SONUÇLAR"])
 
@@ -313,9 +318,9 @@ with t1:
                  f'<td>{r["O"]}</td><td>{r["G"]}</td><td>{r["B"]}</td><td>{r["M"]}</td>'
                  f'<td>{r["A"]}</td><td>{r["Y"]}</td><td>{r["AV"]:+d}</td>'
                  f'<td class="pz">{r["P"]}</td></tr>')
-    st.markdown('<div class="scroll"><table class="tbl t-std"><tr><th>#</th><th>Takım</th><th></th><th>Form</th>'
+    md('<div class="scroll"><table class="tbl t-std"><tr><th>#</th><th>Takım</th><th></th><th>Form</th>'
                 '<th>O</th><th>G</th><th>B</th><th>M</th><th>A</th><th>Y</th>'
-                f'<th>AV</th><th>P</th></tr>{rows}</table></div>', unsafe_allow_html=True)
+                f'<th>AV</th><th>P</th></tr>{rows}</table></div>')
     st.caption("Form son 5 maç, soldan sağa eskiden yeniye. ▲▼ bir önceki haftaya göre.")
 
 with t2:
@@ -339,10 +344,9 @@ with t2:
                  f'<td class="pz">{d["katki"]}</td>'
                  f'<td style="width:110px"><div class="bar">'
                  f'<i style="width:{max(3, round(100*d["katki"]/mx))}%"></i></div></td></tr>')
-    st.markdown('<div class="scroll"><table class="tbl t-pl"><tr><th>#</th><th>Oyuncu</th><th>Kulüp</th>'
+    md('<div class="scroll"><table class="tbl t-pl"><tr><th>#</th><th>Oyuncu</th><th>Kulüp</th>'
                 '<th>Seçim</th><th>Oran</th><th>Takım</th><th>C</th><th>En iyi</th>'
-                f'<th>Boşa</th><th>Katkı</th><th></th></tr>{rows}</table></div>',
-                unsafe_allow_html=True)
+                f'<th>Boşa</th><th>Katkı</th><th></th></tr>{rows}</table></div>')
     st.caption(f"Seçim = {slots} kadro slotunun kaçında yer aldığı "
                f"({NT} takım × {len(weeks)} hafta). Katkı kaptan çarpanı dahil. "
                "Boşa = yedekte kalan puan.")
@@ -360,7 +364,7 @@ with t3:
                       for f in wk["fixtures"] if tsel in (f["home"], f["away"])), "—")
         pill = (f'<span class="pill {CARD_CLS.get(sq["card"], "c-none")}">'
                 f'{CARD_LABEL[sq["card"]]}</span>')
-        st.markdown(f"""<div class="strip">
+        md(f"""<div class="strip">
         <div class="s"><div class="l">MH Toplam</div><div class="v">{sq['mh']}</div>
         <div class="n">rakip: {rival}</div></div>
         <div class="s"><div class="l">Kart</div>
@@ -368,7 +372,7 @@ with t3:
         <div class="s"><div class="l">Kaptan</div><div class="v">{sq['captain']}</div>
         <div class="n">vice: {sq['vice']}</div></div>
         <div class="s"><div class="l">Nostradamus</div><div class="v">{sq['nostradamus']}</div></div>
-        </div>""", unsafe_allow_html=True)
+        </div>""")
 
         def chip(p, dim=False):
             b = ""
@@ -384,12 +388,10 @@ with t3:
         lines = [xi[:1], xi[1:5], xi[5:9], xi[9:]] if len(xi) == 11 else [xi]
         pitch = "".join(f'<div class="row">{"".join(chip(p) for p in ln)}</div>'
                         for ln in lines if ln)
-        st.markdown(f'<div class="pitch">{pitch}</div>', unsafe_allow_html=True)
+        md(f'<div class="pitch">{pitch}</div>')
         counted = sq["card"] == "tum_takim"
-        st.markdown(f'<div class="sec">Yedekler {"— sayıldı" if counted else "— sayılmadı"}</div>',
-                    unsafe_allow_html=True)
-        st.markdown(f'<div class="row">{"".join(chip(p, not counted) for p in sq["bench"])}</div>',
-                    unsafe_allow_html=True)
+        md(f'<div class="sec">Yedekler {"— sayıldı" if counted else "— sayılmadı"}</div>')
+        md(f'<div class="row">{"".join(chip(p, not counted) for p in sq["bench"])}</div>')
         calc = team_points(sq)
         if calc != sq["mh"]:
             st.warning(f"Hesaplanan {calc}, ekrandaki {sq['mh']} ile uyuşmuyor.")
@@ -413,12 +415,11 @@ with t4:
         tot = PER_TYPE * len(CARD_KEYS) - sum(used[t].values())
         rows += f'<tr><td class="tm">{t}</td>{cells}<td class="pz">{tot}</td></tr>'
     heads = "".join(f"<th>{CARD_LABEL[k]}</th>" for k in CARD_KEYS)
-    st.markdown(f'<div class="scroll"><table class="tbl t-card"><tr><th>Takım</th>{heads}<th>Kalan</th></tr>{rows}</table></div>',
-                unsafe_allow_html=True)
+    md(f'<div class="scroll"><table class="tbl t-card"><tr><th>Takım</th>{heads}<th>Kalan</th></tr>{rows}</table></div>')
     st.caption(f"Dolu nokta kalan hakkı gösterir. Her karttan {PER_TYPE}, "
                f"toplam {PER_TYPE*len(CARD_KEYS)}.")
 
-    st.markdown('<div class="sec">Kart kullanım geçmişi</div>', unsafe_allow_html=True)
+    md('<div class="sec">Kart kullanım geçmişi</div>')
     log = ""
     for w in reversed(weeks):
         for t, sq in sorted(w["teams"].items(), key=lambda kv: -kv[1]["mh"]):
@@ -427,8 +428,8 @@ with t4:
                         f'<td><span class="pill {CARD_CLS[sq["card"]]}">'
                         f'{CARD_LABEL[sq["card"]]}</span></td>'
                         f'<td class="pz">{sq["mh"]}</td></tr>')
-    st.markdown('<div class="scroll"><table class="tbl t-log"><tr><th>Hafta</th><th>Takım</th><th>Kart</th>'
-                f'<th>O hafta</th></tr>{log}</table></div>', unsafe_allow_html=True)
+    md('<div class="scroll"><table class="tbl t-log"><tr><th>Hafta</th><th>Takım</th><th>Kart</th>'
+                f'<th>O hafta</th></tr>{log}</table></div>')
 
 with t5:
     for w in reversed(weeks):
@@ -441,4 +442,4 @@ with t5:
                 rows += (f'<tr><td class="{hc}" style="text-align:right">{f["home"]}</td>'
                          f'<td style="text-align:center;color:#fff;font-weight:800">{h} - {a}</td>'
                          f'<td class="{ac}" style="text-align:left">{f["away"]}</td></tr>')
-            st.markdown(f'<div class="scroll"><table class="tbl t-res">{rows}</table></div>', unsafe_allow_html=True)
+            md(f'<div class="scroll"><table class="tbl t-res">{rows}</table></div>')
