@@ -22,6 +22,7 @@ PER_TYPE = 2
 FORM_TR = {"W": "G", "D": "B", "L": "M"}
 
 CSS = """
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;600;800&display=swap');
 .stApp{background:
@@ -108,6 +109,69 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif}
 .stTabs [data-baseweb="tab"]{background:transparent;color:#8e9ad4;font-weight:700;
  font-size:13px;padding:8px 16px}
 .stTabs [aria-selected="true"]{color:#4ade9f;border-bottom:2px solid #4ade9f}
+
+.scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+@media (max-width:760px){
+ .block-container{padding-left:.7rem;padding-right:.7rem;padding-top:.8rem}
+ .hero{padding:16px 16px;border-radius:16px}
+ .hero h1{font-size:32px}
+ .hero p{font-size:10.5px;letter-spacing:.3px}
+
+ /* podyum: lider tam genislik, 2-3 altta yan yana */
+ .pod{grid-template-columns:1fr 1fr;gap:8px}
+ .pod .p1{grid-column:1 / -1}
+ .pod .nm{font-size:19px}
+ .pod .pts{font-size:25px}
+ .pod .sub{font-size:10px}
+ .pod .medal{font-size:20px}
+
+ .strip{grid-template-columns:1fr 1fr;gap:8px}
+ .strip .s{padding:10px 11px}
+ .strip .v{font-size:17px}
+ .strip .l{font-size:9px;letter-spacing:.6px}
+ .strip .n{font-size:10px}
+
+ .tbl{font-size:12.5px}
+ .tbl th,.tbl td{padding:8px 5px}
+ .rk{width:21px;height:21px;font-size:11px;border-radius:7px}
+
+ /* puan durumu: O G B M A Y gizle, form + AV + P kalsin */
+ .t-std th:nth-child(n+5):nth-child(-n+10),
+ .t-std td:nth-child(n+5):nth-child(-n+10){display:none}
+
+ /* oyuncular: secim, takim, en iyi, bosa, bar gizle */
+ .t-pl th:nth-child(4),.t-pl td:nth-child(4),
+ .t-pl th:nth-child(6),.t-pl td:nth-child(6),
+ .t-pl th:nth-child(8),.t-pl td:nth-child(8),
+ .t-pl th:nth-child(9),.t-pl td:nth-child(9),
+ .t-pl th:nth-child(11),.t-pl td:nth-child(11){display:none}
+
+ .t-card{min-width:520px}
+ .t-res td{font-size:12.5px;padding:8px 4px}
+
+ /* saha: 4 sutuna dus, kartlar kucul */
+ .pitch{padding:12px 6px;border-radius:14px}
+ .row{gap:6px;margin-bottom:9px}
+ .pl{width:auto;flex:0 0 calc(25% - 5px);min-width:0;padding:5px 3px}
+ .pl .p{font-size:13px}
+ .pl .n{font-size:10px}
+ .pl .c{font-size:9px}
+ .badge{width:17px;height:17px;line-height:17px;font-size:9px;top:-6px;left:-6px}
+
+ .stTabs [data-baseweb="tab-list"]{overflow-x:auto;flex-wrap:nowrap}
+ .stTabs [data-baseweb="tab"]{padding:8px 10px;font-size:11.5px;white-space:nowrap}
+ .sec{font-size:17px}
+}
+
+@media (max-width:420px){
+ .hero h1{font-size:27px}
+ .strip{grid-template-columns:1fr}
+ .pod .nm{font-size:17px}
+ .pl{flex:0 0 calc(33.333% - 4px)}
+ .tbl{font-size:12px}
+}
+
 .sec{font-family:'Barlow Condensed';font-size:20px;color:#4ade9f;letter-spacing:.6px;
  text-transform:uppercase;margin:18px 0 8px}
 </style>
@@ -249,9 +313,9 @@ with t1:
                  f'<td>{r["O"]}</td><td>{r["G"]}</td><td>{r["B"]}</td><td>{r["M"]}</td>'
                  f'<td>{r["A"]}</td><td>{r["Y"]}</td><td>{r["AV"]:+d}</td>'
                  f'<td class="pz">{r["P"]}</td></tr>')
-    st.markdown('<table class="tbl"><tr><th>#</th><th>Takım</th><th></th><th>Form</th>'
+    st.markdown('<div class="scroll"><table class="tbl t-std"><tr><th>#</th><th>Takım</th><th></th><th>Form</th>'
                 '<th>O</th><th>G</th><th>B</th><th>M</th><th>A</th><th>Y</th>'
-                f'<th>AV</th><th>P</th></tr>{rows}</table>', unsafe_allow_html=True)
+                f'<th>AV</th><th>P</th></tr>{rows}</table></div>', unsafe_allow_html=True)
     st.caption("Form son 5 maç, soldan sağa eskiden yeniye. ▲▼ bir önceki haftaya göre.")
 
 with t2:
@@ -275,9 +339,9 @@ with t2:
                  f'<td class="pz">{d["katki"]}</td>'
                  f'<td style="width:110px"><div class="bar">'
                  f'<i style="width:{max(3, round(100*d["katki"]/mx))}%"></i></div></td></tr>')
-    st.markdown('<table class="tbl"><tr><th>#</th><th>Oyuncu</th><th>Kulüp</th>'
+    st.markdown('<div class="scroll"><table class="tbl t-pl"><tr><th>#</th><th>Oyuncu</th><th>Kulüp</th>'
                 '<th>Seçim</th><th>Oran</th><th>Takım</th><th>C</th><th>En iyi</th>'
-                f'<th>Boşa</th><th>Katkı</th><th></th></tr>{rows}</table>',
+                f'<th>Boşa</th><th>Katkı</th><th></th></tr>{rows}</table></div>',
                 unsafe_allow_html=True)
     st.caption(f"Seçim = {slots} kadro slotunun kaçında yer aldığı "
                f"({NT} takım × {len(weeks)} hafta). Katkı kaptan çarpanı dahil. "
@@ -349,7 +413,7 @@ with t4:
         tot = PER_TYPE * len(CARD_KEYS) - sum(used[t].values())
         rows += f'<tr><td class="tm">{t}</td>{cells}<td class="pz">{tot}</td></tr>'
     heads = "".join(f"<th>{CARD_LABEL[k]}</th>" for k in CARD_KEYS)
-    st.markdown(f'<table class="tbl"><tr><th>Takım</th>{heads}<th>Kalan</th></tr>{rows}</table>',
+    st.markdown(f'<div class="scroll"><table class="tbl t-card"><tr><th>Takım</th>{heads}<th>Kalan</th></tr>{rows}</table></div>',
                 unsafe_allow_html=True)
     st.caption(f"Dolu nokta kalan hakkı gösterir. Her karttan {PER_TYPE}, "
                f"toplam {PER_TYPE*len(CARD_KEYS)}.")
@@ -363,8 +427,8 @@ with t4:
                         f'<td><span class="pill {CARD_CLS[sq["card"]]}">'
                         f'{CARD_LABEL[sq["card"]]}</span></td>'
                         f'<td class="pz">{sq["mh"]}</td></tr>')
-    st.markdown('<table class="tbl"><tr><th>Hafta</th><th>Takım</th><th>Kart</th>'
-                f'<th>O hafta</th></tr>{log}</table>', unsafe_allow_html=True)
+    st.markdown('<div class="scroll"><table class="tbl t-log"><tr><th>Hafta</th><th>Takım</th><th>Kart</th>'
+                f'<th>O hafta</th></tr>{log}</table></div>', unsafe_allow_html=True)
 
 with t5:
     for w in reversed(weeks):
@@ -377,4 +441,4 @@ with t5:
                 rows += (f'<tr><td class="{hc}" style="text-align:right">{f["home"]}</td>'
                          f'<td style="text-align:center;color:#fff;font-weight:800">{h} - {a}</td>'
                          f'<td class="{ac}" style="text-align:left">{f["away"]}</td></tr>')
-            st.markdown(f'<table class="tbl">{rows}</table>', unsafe_allow_html=True)
+            st.markdown(f'<div class="scroll"><table class="tbl t-res">{rows}</table></div>', unsafe_allow_html=True)
