@@ -196,6 +196,20 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif}
  text-transform:uppercase;margin:18px 0 8px}
 </style>
 """
+
+TR_ALPHABET = "aAbBcCçÇdDeEfFgGğĞhHıIiİjJkKlLmMnNoOöÖpPrRsSşŞtTuUüÜvVyYzZ"
+_TR_ORDER = {ch: i for i, ch in enumerate(TR_ALPHABET)}
+
+
+def tr_key(text: str):
+    """Turkce alfabeye gore siralama anahtari.
+
+    ç, ğ, ı, i, ö, ş, ü dogru yere oturur ve buyuk/kucuk harf farki
+    siralamayi bozmaz (avengers ile Bekiroteam ayni kefede).
+    """
+    return [_TR_ORDER.get(ch, ord(ch) + 1000) // 2 for ch in str(text)]
+
+
 def md(html: str):
     """HTML'i ham metne dusurmeden basar.
 
@@ -348,7 +362,9 @@ with t1:
         "Takım":       lambda r: r["t"].lower(),
     }
     k1, k2 = st.columns([2, 1])
-    std_by = k1.selectbox("Sırala", list(STD_SORTS), index=0, key="stdsort")
+    std_opts = sorted(STD_SORTS, key=tr_key)
+    std_by = k1.selectbox("Sırala", std_opts,
+                          index=std_opts.index("Puan"), key="stdsort")
     std_ord = k2.radio("Yön", ["Azalan", "Artan"], horizontal=True, key="stdord")
     std_asc = std_ord == "Artan"
     view = sorted(table, key=STD_SORTS[std_by], reverse=not std_asc)
@@ -383,13 +399,16 @@ with t1:
 with t2:
     slots = NT * len(weeks)
     c1, c2 = st.columns([1, 2])
-    club = c1.selectbox("Kulüp", ["Hepsi"] + sorted({d["club"] for d in pl.values()}))
+    club = c1.selectbox("Kulüp",
+                        ["Hepsi"] + sorted({d["club"] for d in pl.values()}, key=tr_key))
     q = c2.text_input("Oyuncu ara", "")
 
     items = [(n, d) for n, d in pl.items()
              if (club == "Hepsi" or d["club"] == club) and q.lower() in n.lower()]
 
-    who = st.selectbox("Oyuncu detayı", ["—"] + [n for n, _ in items], key="who")
+    who = st.selectbox("Oyuncu detayı",
+                       ["—"] + sorted((n for n, _ in items), key=tr_key),
+                       key="who")
     if who != "—":
         d = pl[who]
         chips = "".join(
@@ -413,7 +432,9 @@ with t2:
         "Kulüp":      lambda n, d: (d["club"], -d["katki"]),
     }
     s1, s2 = st.columns([2, 1])
-    sort_by = s1.selectbox("Sırala", list(SORTS), index=0)
+    sort_opts = sorted(SORTS, key=tr_key)
+    sort_by = s1.selectbox("Sırala", sort_opts,
+                           index=sort_opts.index("Katkı"))
     order = s2.radio("Yön", ["Azalan", "Artan"], horizontal=True, label_visibility="visible")
 
     asc = order == "Artan"
@@ -459,7 +480,7 @@ with t2:
 
 with t3:
     c1, c2 = st.columns(2)
-    tsel = c1.selectbox("Takım", sorted(weeks[-1]["teams"]))
+    tsel = c1.selectbox("Takım", sorted(weeks[-1]["teams"], key=tr_key))
     wsel = c2.selectbox("Maç haftası", [w["week"] for w in reversed(weeks)])
     wk = next(w for w in weeks if w["week"] == wsel)
     sq = wk["teams"].get(tsel)
