@@ -177,12 +177,17 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif}
 </style>
 """
 def md(html: str):
-    """HTML'i markdown'a kod blogu saydirmadan basar (satir basi bosluklarini kirpar)."""
-    st.markdown("\n".join(line.strip() for line in html.splitlines()),
-                unsafe_allow_html=True)
+    """HTML'i ham metne dusurmeden basar.
+
+    Markdown'da HTML blogu bos satirda biter ve devami duz yazi olarak
+    gorunur; 4+ bosluk girinti de kod blogu sayilir. Bu yuzden satir basi
+    bosluklarini kirpip bos satirlari tamamen atiyoruz.
+    """
+    clean = [line.strip() for line in html.splitlines()]
+    st.markdown("\n".join(l for l in clean if l), unsafe_allow_html=True)
 
 
-md(CSS)
+md(CSS)  # bos satirlar md() icinde temizleniyor
 
 
 @st.cache_data
