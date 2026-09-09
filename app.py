@@ -167,10 +167,10 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif}
  .t-std td:nth-child(n+5):nth-child(-n+8){display:none}
 
  /* oyuncular: secim, takim, en iyi, bosa, bar gizle */
- .t-pl th:nth-child(7),.t-pl td:nth-child(7),
- .t-pl th:nth-child(9),.t-pl td:nth-child(9),
+ .t-pl th:nth-child(8),.t-pl td:nth-child(8),
  .t-pl th:nth-child(10),.t-pl td:nth-child(10),
- .t-pl th:nth-child(12),.t-pl td:nth-child(12){display:none}
+ .t-pl th:nth-child(11),.t-pl td:nth-child(11),
+ .t-pl th:nth-child(13),.t-pl td:nth-child(13){display:none}
 
  .t-card{min-width:520px}
  .t-res td{font-size:12.5px;padding:8px 4px}
@@ -233,6 +233,13 @@ def weeks_label(v) -> str:
 POS_ORDER = ["KL", "DEF", "OS", "FOR"]
 POS_LABEL = {"KL": "Kaleci", "DEF": "Defans", "OS": "Orta saha", "FOR": "Forvet"}
 POS_FILE = {}   # oyuncu -> pozisyon; positions.json varsa doldurulur
+PRICE_FILE = {}  # oyuncu -> maliyet; prices.json varsa doldurulur
+
+
+def price_of(p):
+    """Oyuncunun maliyeti (milyon); bilinmiyorsa None."""
+    v = PRICE_FILE.get(f'{p["name"]}|{p["club"]}')
+    return v if v is not None else PRICE_FILE.get(p["name"])
 
 
 def pos_of(p) -> str:
@@ -266,6 +273,17 @@ def md(html: str):
 
 
 md(CSS)  # bos satirlar md() icinde temizleniyor
+
+
+def load_json_file(fname):
+    """SEARCH_DIRS icinde adi verilen json'i arar (cache yok)."""
+    for d in SEARCH_DIRS:
+        fp = os.path.join(d, fname)
+        if os.path.exists(fp):
+            with open(fp, encoding="utf-8") as f:
+                return {k: v for k, v in json.load(f).items()
+                        if not k.startswith("_")}
+    return {}
 
 
 def load_positions():   # cache YOK: dosya sonradan eklenince hemen gorunsun
@@ -322,7 +340,7 @@ def build_table(weeks, upto=None):
 
 
 def player_stats(weeks):
-    pl = defaultdict(lambda: dict(name="", club="", pos="", sec=0, xi=0, cap=0, katki=0,
+    pl = defaultdict(lambda: dict(name="", club="", pos="", price=None, sec=0, xi=0, cap=0, katki=0,
                                   bosa=0, best=0, teams=set(),
                                   by=defaultdict(lambda: {"w": [], "c": 0, "cw": set()})))
     for w in weeks:
@@ -332,6 +350,7 @@ def player_stats(weeks):
                 d = pl[(p["name"], p["club"])]
                 d["name"], d["club"] = p["name"], p["club"]
                 d["pos"] = d["pos"] or pos_of(p)
+                d["price"] = d["price"] if d["price"] is not None else price_of(p)
                 d["sec"] += 1; d["xi"] += 1
                 d["teams"].add(tn); d["best"] = max(d["best"], p["points"])
                 d["katki"] += p["points"] * (m if p["name"] == sq["captain"] else 1)
@@ -344,6 +363,7 @@ def player_stats(weeks):
                 d = pl[(p["name"], p["club"])]
                 d["name"], d["club"] = p["name"], p["club"]
                 d["pos"] = d["pos"] or pos_of(p)
+                d["price"] = d["price"] if d["price"] is not None else price_of(p)
                 d["sec"] += 1
                 d["teams"].add(tn); d["best"] = max(d["best"], p["points"])
                 d["by"][tn]["w"].append(w["week"])
@@ -355,6 +375,7 @@ def player_stats(weeks):
 
 
 POS_FILE.update(load_positions())
+PRICE_FILE.update(load_json_file("prices.json"))
 
 
 def pos_warning():
@@ -518,6 +539,9 @@ with t2:
         "Oran":       lambda n, d: d["sec"],
         "Kaç takım":  lambda n, d: len(d["teams"]),
         "Kaptanlık":  lambda n, d: d["cap"],
+        "Fiyat":      lambda n, d: (d["price"] or 0),
+        "Verim":      lambda n, d: (round(d["katki"] / d["price"], 1)
+                                    if d["price"] else 0),
         "En iyi":     lambda n, d: d["best"],
         "Boşa":       lambda n, d: d["bosa"],
         "İlk 11":     lambda n, d: d["xi"],
@@ -573,6 +597,7 @@ with t2:
                  f'</span></td>'
                  f'<td>{d["club"]}</td>'
                  f'<td><span class="pz-{d["pos"] or "NA"}">{d["pos"] or "—"}</span></td>'
+                 f'<td>{d["price"] if d["price"] else "—"}</td>'
                  f'<td><b>{d["sec"]}</b><span class="of">/{slots}</span></td><td>%{pct}</td>'
                  f'<td>{len(d["teams"])}<span class="of">/{NT}</span></td>'
                  f'<td>{d["cap"] or ""}</td>'
@@ -580,7 +605,7 @@ with t2:
                  f'<td class="pz">{d["katki"]}</td>'
                  f'<td style="width:110px"><div class="bar">'
                  f'<i style="width:{max(3, round(100*d["katki"]/mx))}%"></i></div></td></tr>')
-    heads = ("<th>#</th>" + th("Oyuncu") + th("Kulüp") + th("Pozisyon") + th("Seçim") + th("Oran")
+    heads = ("<th>#</th>" + th("Oyuncu") + th("Kulüp") + th("Pozisyon") + th("Fiyat") + th("Seçim") + th("Oran")
              + th("Kaç takım") + th("Kaptanlık") + th("En iyi") + th("Boşa")
              + th("Katkı") + "<th></th>")
     md(f'<div class="scroll"><table class="tbl t-pl"><tr>{heads}</tr>{rows}</table></div>')
@@ -600,6 +625,11 @@ with t3:
     if not sq:
         st.info("Bu hafta bu takıma ait kadro yok.")
     else:
+        _xi_v = [price_of(p) for p in sq["xi"] if price_of(p)]
+        _bn_v = [price_of(p) for p in sq["bench"] if price_of(p)]
+        xi_value = round(sum(_xi_v), 1)
+        bench_value = round(sum(_bn_v), 1)
+        squad_value = round(xi_value + bench_value, 1) if (_xi_v or _bn_v) else "—"
         rival = next((f["away"] if f["home"] == tsel else f["home"]
                       for f in wk["fixtures"] if tsel in (f["home"], f["away"])), "—")
         pill = (f'<span class="pill {CARD_CLS.get(sq["card"], "c-none")}">'
@@ -612,6 +642,8 @@ with t3:
         <div class="s"><div class="l">Kaptan</div><div class="v">{sq['captain']}</div>
         <div class="n">vice: {sq['vice']}</div></div>
         <div class="s"><div class="l">Nostradamus</div><div class="v">{sq['nostradamus']}</div></div>
+        <div class="s"><div class="l">Kadro değeri</div><div class="v">{squad_value}</div>
+        <div class="n">{xi_value} ilk 11 · {bench_value} yedek</div></div>
         </div>""")
 
         mult = sq["multiplier"]
@@ -632,7 +664,8 @@ with t3:
             eff = p["points"] * mult if p["name"] == sq["captain"] else p["points"]
             return (f'<div class="pl{" dim" if dim else ""}">{b}'
                     f'<div class="p">{eff}{extra}</div><div class="n">{p["name"]}</div>'
-                    f'<div class="c">{pos_of(p) + " · " if pos_of(p) else ""}{p["club"]}</div></div>')
+                    f'<div class="c">{pos_of(p) + " · " if pos_of(p) else ""}{p["club"]}'
+                    f'{" · " + str(price_of(p)) if price_of(p) else ""}</div></div>')
 
         if not POS_FILE:
             pos_warning()
