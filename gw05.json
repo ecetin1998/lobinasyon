@@ -1,0 +1,1627 @@
+{
+ "week": 5,
+ "fixtures": [
+  {
+   "home": "Tomarza",
+   "home_score": 51,
+   "away_score": 61,
+   "away": "Zülfikar24"
+  },
+  {
+   "home": "bilanço",
+   "home_score": 68,
+   "away_score": 44,
+   "away": "OHE"
+  },
+  {
+   "home": "Cefoo61",
+   "home_score": 61,
+   "away_score": 38,
+   "away": "avengers"
+  },
+  {
+   "home": "Mxscyn",
+   "home_score": 33,
+   "away_score": 52,
+   "away": "pompacıhamsi"
+  },
+  {
+   "home": "Yarasa SK",
+   "home_score": 48,
+   "away_score": 23,
+   "away": "Catenicco"
+  },
+  {
+   "home": "KOLPADASIN",
+   "home_score": 48,
+   "away_score": 41,
+   "away": "Serdar Ekinci"
+  },
+  {
+   "home": "Hasan",
+   "home_score": 55,
+   "away_score": 59,
+   "away": "Bekiroteam"
+  },
+  {
+   "home": "ÖFC",
+   "home_score": 31,
+   "away_score": 53,
+   "away": "HASTEAM"
+  },
+  {
+   "home": "Serhat",
+   "home_score": 50,
+   "away_score": 67,
+   "away": "Royal Combat Team"
+  }
+ ],
+ "teams": {
+  "bilanço": {
+   "mh": 68,
+   "nostradamus": 7,
+   "card": null,
+   "captain": "Salah",
+   "vice": "Greenwood",
+   "multiplier": 2,
+   "xi": [
+    {
+     "name": "Fofana",
+     "club": "ÇRS",
+     "points": 13
+    },
+    {
+     "name": "Hadërgjonaj",
+     "club": "ALY",
+     "points": 1
+    },
+    {
+     "name": "Mithat",
+     "club": "ÇRS",
+     "points": 5
+    },
+    {
+     "name": "Brown",
+     "club": "FB",
+     "points": 8
+    },
+    {
+     "name": "Salah",
+     "club": "TS",
+     "points": 4
+    },
+    {
+     "name": "Greenwood",
+     "club": "FB",
+     "points": 3
+    },
+    {
+     "name": "Trossard",
+     "club": "BJK",
+     "points": 9
+    },
+    {
+     "name": "Ruan",
+     "club": "ALY",
+     "points": 1
+    },
+    {
+     "name": "Emre",
+     "club": "SAM",
+     "points": 5
+    },
+    {
+     "name": "Ramirez",
+     "club": "ÇRM",
+     "points": 12
+    },
+    {
+     "name": "Muriqi",
+     "club": "FB",
+     "points": 0
+    }
+   ],
+   "bench": [
+    {
+     "name": "Gianniotis",
+     "club": "KSP",
+     "points": 3
+    },
+    {
+     "name": "Orban",
+     "club": "AMD",
+     "points": 17
+    },
+    {
+     "name": "Winck",
+     "club": "KSP",
+     "points": 1
+    },
+    {
+     "name": "Lima",
+     "club": "ALY",
+     "points": 0
+    }
+   ]
+  },
+  "Royal Combat Team": {
+   "mh": 67,
+   "nostradamus": 0,
+   "card": null,
+   "captain": "Škriniar",
+   "vice": "Orkun",
+   "multiplier": 2,
+   "xi": [
+    {
+     "name": "Nübel",
+     "club": "BJK",
+     "points": 6
+    },
+    {
+     "name": "Škriniar",
+     "club": "FB",
+     "points": 16
+    },
+    {
+     "name": "Pina",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Sánchez",
+     "club": "GS",
+     "points": 8
+    },
+    {
+     "name": "Abdulkerim",
+     "club": "GS",
+     "points": 14
+    },
+    {
+     "name": "İlhan",
+     "club": "BJK",
+     "points": 6
+    },
+    {
+     "name": "Kanté",
+     "club": "FB",
+     "points": 3
+    },
+    {
+     "name": "Guendouzi",
+     "club": "FB",
+     "points": 3
+    },
+    {
+     "name": "Orkun",
+     "club": "BJK",
+     "points": 5
+    },
+    {
+     "name": "Onuachu",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Shomu",
+     "club": "BFK",
+     "points": 2
+    }
+   ],
+   "bench": [
+    {
+     "name": "Muhammed",
+     "club": "BFK",
+     "points": 0
+    },
+    {
+     "name": "Osimhen",
+     "club": "GS",
+     "points": 0
+    },
+    {
+     "name": "Muçi",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Ümit",
+     "club": "BJK",
+     "points": 0
+    }
+   ]
+  },
+  "Zülfikar24": {
+   "mh": 61,
+   "nostradamus": 0,
+   "card": null,
+   "captain": "Salah",
+   "vice": "Shomu",
+   "multiplier": 2,
+   "xi": [
+    {
+     "name": "Fofana",
+     "club": "ÇRS",
+     "points": 13
+    },
+    {
+     "name": "Hadërgjonaj",
+     "club": "ALY",
+     "points": 1
+    },
+    {
+     "name": "Agbadou",
+     "club": "BJK",
+     "points": 6
+    },
+    {
+     "name": "Murillo",
+     "club": "BJK",
+     "points": 11
+    },
+    {
+     "name": "Salah",
+     "club": "TS",
+     "points": 4
+    },
+    {
+     "name": "Sara",
+     "club": "GS",
+     "points": 1
+    },
+    {
+     "name": "Torreira",
+     "club": "GS",
+     "points": 3
+    },
+    {
+     "name": "Greenwood",
+     "club": "FB",
+     "points": 3
+    },
+    {
+     "name": "Shomu",
+     "club": "BFK",
+     "points": 2
+    },
+    {
+     "name": "Benedyczak",
+     "club": "KSP",
+     "points": 9
+    },
+    {
+     "name": "Ali Sowe",
+     "club": "ÇRS",
+     "points": 8
+    }
+   ],
+   "bench": [
+    {
+     "name": "Nübel",
+     "club": "BJK",
+     "points": 6
+    },
+    {
+     "name": "Brown",
+     "club": "FB",
+     "points": 8
+    },
+    {
+     "name": "Ruan",
+     "club": "ALY",
+     "points": 1
+    },
+    {
+     "name": "Mithat",
+     "club": "ÇRS",
+     "points": 5
+    }
+   ]
+  },
+  "Cefoo61": {
+   "mh": 61,
+   "nostradamus": 0,
+   "card": null,
+   "captain": "Outtara",
+   "vice": "Onuachu",
+   "multiplier": 2,
+   "xi": [
+    {
+     "name": "Uğurcan",
+     "club": "GS",
+     "points": 8
+    },
+    {
+     "name": "Sánchez",
+     "club": "GS",
+     "points": 8
+    },
+    {
+     "name": "Škriniar",
+     "club": "FB",
+     "points": 8
+    },
+    {
+     "name": "Abdulkerim",
+     "club": "GS",
+     "points": 14
+    },
+    {
+     "name": "Outtara",
+     "club": "BJK",
+     "points": 10
+    },
+    {
+     "name": "Cerny",
+     "club": "BJK",
+     "points": 3
+    },
+    {
+     "name": "Aral",
+     "club": "TS",
+     "points": 1
+    },
+    {
+     "name": "Salah",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Kerem",
+     "club": "FB",
+     "points": 3
+    },
+    {
+     "name": "Onuachu",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Shomu",
+     "club": "BFK",
+     "points": 2
+    }
+   ],
+   "bench": [
+    {
+     "name": "Nübel",
+     "club": "BJK",
+     "points": 6
+    },
+    {
+     "name": "Uğur",
+     "club": "KS",
+     "points": 1
+    },
+    {
+     "name": "Luiz",
+     "club": "GÖZ",
+     "points": 0
+    },
+    {
+     "name": "Nene",
+     "club": "FB",
+     "points": 0
+    }
+   ]
+  },
+  "Bekiroteam": {
+   "mh": 59,
+   "nostradamus": 0,
+   "card": null,
+   "captain": "Onuachu",
+   "vice": "Benedyczak",
+   "multiplier": 2,
+   "xi": [
+    {
+     "name": "Nübel",
+     "club": "BJK",
+     "points": 6
+    },
+    {
+     "name": "Pina",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Škriniar",
+     "club": "FB",
+     "points": 8
+    },
+    {
+     "name": "Abdulkerim",
+     "club": "GS",
+     "points": 14
+    },
+    {
+     "name": "Jacobs",
+     "club": "GS",
+     "points": 1
+    },
+    {
+     "name": "Salah",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Batrakov",
+     "club": "GS",
+     "points": 4
+    },
+    {
+     "name": "Orkun",
+     "club": "BJK",
+     "points": 5
+    },
+    {
+     "name": "Mahmic",
+     "club": "ÇRM",
+     "points": 4
+    },
+    {
+     "name": "Onuachu",
+     "club": "TS",
+     "points": 4
+    },
+    {
+     "name": "Benedyczak",
+     "club": "KSP",
+     "points": 9
+    }
+   ],
+   "bench": [
+    {
+     "name": "Deniz",
+     "club": "KNY",
+     "points": 0
+    },
+    {
+     "name": "Ake",
+     "club": "FB",
+     "points": 8
+    },
+    {
+     "name": "Kozlowski",
+     "club": "GFK",
+     "points": 3
+    },
+    {
+     "name": "Orban",
+     "club": "AMD",
+     "points": 17
+    }
+   ]
+  },
+  "Hasan": {
+   "mh": 55,
+   "nostradamus": 0,
+   "card": null,
+   "captain": "Salah",
+   "vice": "Oh",
+   "multiplier": 2,
+   "xi": [
+    {
+     "name": "Fofana",
+     "club": "ÇRS",
+     "points": 13
+    },
+    {
+     "name": "Mithat",
+     "club": "ÇRS",
+     "points": 5
+    },
+    {
+     "name": "Sagnan",
+     "club": "ÇRS",
+     "points": 5
+    },
+    {
+     "name": "Winck",
+     "club": "KSP",
+     "points": 1
+    },
+    {
+     "name": "Arous",
+     "club": "KSP",
+     "points": 6
+    },
+    {
+     "name": "Cerny",
+     "club": "BJK",
+     "points": 3
+    },
+    {
+     "name": "Trossard",
+     "club": "BJK",
+     "points": 9
+    },
+    {
+     "name": "Salah",
+     "club": "TS",
+     "points": 4
+    },
+    {
+     "name": "Muçi",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Oh",
+     "club": "BJK",
+     "points": 5
+    },
+    {
+     "name": "Onuachu",
+     "club": "TS",
+     "points": 2
+    }
+   ],
+   "bench": [
+    {
+     "name": "Gianniotis",
+     "club": "KSP",
+     "points": 3
+    },
+    {
+     "name": "Lukaku",
+     "club": "FB",
+     "points": 2
+    },
+    {
+     "name": "Škriniar",
+     "club": "FB",
+     "points": 8
+    },
+    {
+     "name": "Dia Saba",
+     "club": "AMD",
+     "points": 3
+    }
+   ]
+  },
+  "HASTEAM": {
+   "mh": 53,
+   "nostradamus": 5,
+   "card": null,
+   "captain": "Salah",
+   "vice": "Muriqi",
+   "multiplier": 2,
+   "xi": [
+    {
+     "name": "Onana",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Brown",
+     "club": "FB",
+     "points": 8
+    },
+    {
+     "name": "Škriniar",
+     "club": "FB",
+     "points": 8
+    },
+    {
+     "name": "Murillo",
+     "club": "BJK",
+     "points": 11
+    },
+    {
+     "name": "Salah",
+     "club": "TS",
+     "points": 4
+    },
+    {
+     "name": "Yunus",
+     "club": "GS",
+     "points": 3
+    },
+    {
+     "name": "Muçi",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Cerny",
+     "club": "BJK",
+     "points": 3
+    },
+    {
+     "name": "Orkun",
+     "club": "BJK",
+     "points": 5
+    },
+    {
+     "name": "Shomu",
+     "club": "BFK",
+     "points": 2
+    },
+    {
+     "name": "Muriqi",
+     "club": "FB",
+     "points": 0
+    }
+   ],
+   "bench": [
+    {
+     "name": "Fofana",
+     "club": "ÇRS",
+     "points": 13
+    },
+    {
+     "name": "Winck",
+     "club": "KSP",
+     "points": 1
+    },
+    {
+     "name": "Aliti",
+     "club": "ALY",
+     "points": 1
+    },
+    {
+     "name": "Benedyczak",
+     "club": "KSP",
+     "points": 9
+    }
+   ]
+  },
+  "pompacıhamsi": {
+   "mh": 52,
+   "nostradamus": 0,
+   "card": null,
+   "captain": "Salah",
+   "vice": "Orkun",
+   "multiplier": 2,
+   "xi": [
+    {
+     "name": "Uğurcan",
+     "club": "GS",
+     "points": 8
+    },
+    {
+     "name": "Sánchez",
+     "club": "GS",
+     "points": 8
+    },
+    {
+     "name": "Ake",
+     "club": "FB",
+     "points": 8
+    },
+    {
+     "name": "Pina",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Sorescu",
+     "club": "GFK",
+     "points": 8
+    },
+    {
+     "name": "Kanté",
+     "club": "FB",
+     "points": 3
+    },
+    {
+     "name": "Greenwood",
+     "club": "FB",
+     "points": 3
+    },
+    {
+     "name": "Muçi",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Orkun",
+     "club": "BJK",
+     "points": 5
+    },
+    {
+     "name": "Salah",
+     "club": "TS",
+     "points": 4
+    },
+    {
+     "name": "Arda",
+     "club": "KS",
+     "points": 1
+    }
+   ],
+   "bench": [
+    {
+     "name": "Orbanic",
+     "club": "ERZ",
+     "points": 0
+    },
+    {
+     "name": "Osimhen",
+     "club": "GS",
+     "points": 0
+    },
+    {
+     "name": "Abdurrahman",
+     "club": "GB",
+     "points": 1
+    },
+    {
+     "name": "Hwang",
+     "club": "ALY",
+     "points": 1
+    }
+   ]
+  },
+  "Tomarza": {
+   "mh": 51,
+   "nostradamus": 0,
+   "card": null,
+   "captain": "Škriniar",
+   "vice": "Greenwood",
+   "multiplier": 2,
+   "xi": [
+    {
+     "name": "Nübel",
+     "club": "BJK",
+     "points": 6
+    },
+    {
+     "name": "Škriniar",
+     "club": "FB",
+     "points": 16
+    },
+    {
+     "name": "Tayyip T.",
+     "club": "ÇRS",
+     "points": 1
+    },
+    {
+     "name": "Cissé",
+     "club": "AMD",
+     "points": 1
+    },
+    {
+     "name": "Greenwood",
+     "club": "FB",
+     "points": 3
+    },
+    {
+     "name": "Guendouzi",
+     "club": "FB",
+     "points": 3
+    },
+    {
+     "name": "Sané",
+     "club": "GS",
+     "points": 1
+    },
+    {
+     "name": "Trossard",
+     "club": "BJK",
+     "points": 9
+    },
+    {
+     "name": "Deniz",
+     "club": "KNY",
+     "points": 2
+    },
+    {
+     "name": "Osimhen",
+     "club": "GS",
+     "points": 0
+    },
+    {
+     "name": "Benedyczak",
+     "club": "KSP",
+     "points": 9
+    }
+   ],
+   "bench": [
+    {
+     "name": "Uğurcan",
+     "club": "GS",
+     "points": 8
+    },
+    {
+     "name": "Thiam",
+     "club": "ÇRM",
+     "points": 0
+    },
+    {
+     "name": "Uduokhai",
+     "club": "BJK",
+     "points": 0
+    },
+    {
+     "name": "Kharebashvili",
+     "club": "BFK",
+     "points": 0
+    }
+   ]
+  },
+  "Serhat": {
+   "mh": 50,
+   "nostradamus": 4,
+   "card": "tripleks",
+   "captain": "Salah",
+   "vice": "Orkun",
+   "multiplier": 3,
+   "xi": [
+    {
+     "name": "Onana",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Brown",
+     "club": "FB",
+     "points": 8
+    },
+    {
+     "name": "Agbadou",
+     "club": "BJK",
+     "points": 6
+    },
+    {
+     "name": "Hadërgjonaj",
+     "club": "ALY",
+     "points": 1
+    },
+    {
+     "name": "Orkun",
+     "club": "BJK",
+     "points": 5
+    },
+    {
+     "name": "Salah",
+     "club": "TS",
+     "points": 6
+    },
+    {
+     "name": "Sara",
+     "club": "GS",
+     "points": 1
+    },
+    {
+     "name": "Greenwood",
+     "club": "FB",
+     "points": 3
+    },
+    {
+     "name": "Yunus",
+     "club": "GS",
+     "points": 3
+    },
+    {
+     "name": "Benedyczak",
+     "club": "KSP",
+     "points": 9
+    },
+    {
+     "name": "Shomu",
+     "club": "BFK",
+     "points": 2
+    }
+   ],
+   "bench": [
+    {
+     "name": "Victor",
+     "club": "ALY",
+     "points": 1
+    },
+    {
+     "name": "Oh",
+     "club": "BJK",
+     "points": 5
+    },
+    {
+     "name": "Goutas",
+     "club": "GB",
+     "points": 6
+    },
+    {
+     "name": "Ariss",
+     "club": "ÇRS",
+     "points": 0
+    }
+   ]
+  },
+  "Yarasa SK": {
+   "mh": 48,
+   "nostradamus": 0,
+   "card": null,
+   "captain": "Osimhen",
+   "vice": "Greenwood",
+   "multiplier": 2,
+   "xi": [
+    {
+     "name": "Fofana",
+     "club": "ÇRS",
+     "points": 13
+    },
+    {
+     "name": "Sorescu",
+     "club": "GFK",
+     "points": 8
+    },
+    {
+     "name": "Mocsi",
+     "club": "ÇRS",
+     "points": 5
+    },
+    {
+     "name": "Lima",
+     "club": "ALY",
+     "points": 0
+    },
+    {
+     "name": "Nwaiwu",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Škriniar",
+     "club": "FB",
+     "points": 8
+    },
+    {
+     "name": "Salah",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Sara",
+     "club": "GS",
+     "points": 1
+    },
+    {
+     "name": "Laçi",
+     "club": "ÇRS",
+     "points": 3
+    },
+    {
+     "name": "Greenwood",
+     "club": "FB",
+     "points": 6
+    },
+    {
+     "name": "Muriqi",
+     "club": "FB",
+     "points": 0
+    }
+   ],
+   "bench": [
+    {
+     "name": "Gianniotis",
+     "club": "KSP",
+     "points": 3
+    },
+    {
+     "name": "Osimhen",
+     "club": "GS",
+     "points": 0
+    },
+    {
+     "name": "Dia Saba",
+     "club": "AMD",
+     "points": 3
+    },
+    {
+     "name": "Ahmed",
+     "club": "EYP",
+     "points": 2
+    }
+   ]
+  },
+  "KOLPADASIN": {
+   "mh": 48,
+   "nostradamus": 0,
+   "card": null,
+   "captain": "Salah",
+   "vice": "Leao",
+   "multiplier": 2,
+   "xi": [
+    {
+     "name": "Nübel",
+     "club": "BJK",
+     "points": 6
+    },
+    {
+     "name": "Murillo",
+     "club": "BJK",
+     "points": 11
+    },
+    {
+     "name": "Brown",
+     "club": "FB",
+     "points": 8
+    },
+    {
+     "name": "Sallai",
+     "club": "GS",
+     "points": 5
+    },
+    {
+     "name": "Salah",
+     "club": "TS",
+     "points": 4
+    },
+    {
+     "name": "Muçi",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Orkun",
+     "club": "BJK",
+     "points": 5
+    },
+    {
+     "name": "Sara",
+     "club": "GS",
+     "points": 1
+    },
+    {
+     "name": "Leao",
+     "club": "GS",
+     "points": 3
+    },
+    {
+     "name": "Shomu",
+     "club": "BFK",
+     "points": 2
+    },
+    {
+     "name": "Dju",
+     "club": "TS",
+     "points": 1
+    }
+   ],
+   "bench": [
+    {
+     "name": "Bilal",
+     "club": "SAM",
+     "points": 0
+    },
+    {
+     "name": "Furkan",
+     "club": "GÖZ",
+     "points": 0
+    },
+    {
+     "name": "Ahmed",
+     "club": "EYP",
+     "points": 2
+    },
+    {
+     "name": "Aliti",
+     "club": "ALY",
+     "points": 1
+    }
+   ]
+  },
+  "OHE": {
+   "mh": 44,
+   "nostradamus": 4,
+   "card": "tum_takim",
+   "captain": "Salah",
+   "vice": "Shomu",
+   "multiplier": 2,
+   "xi": [
+    {
+     "name": "İrfan Can",
+     "club": "GB",
+     "points": 1
+    },
+    {
+     "name": "Winck",
+     "club": "KSP",
+     "points": 1
+    },
+    {
+     "name": "Hadërgjonaj",
+     "club": "ALY",
+     "points": 1
+    },
+    {
+     "name": "Lima",
+     "club": "ALY",
+     "points": 0
+    },
+    {
+     "name": "Orkun",
+     "club": "BJK",
+     "points": 5
+    },
+    {
+     "name": "Trossard",
+     "club": "BJK",
+     "points": 9
+    },
+    {
+     "name": "Muçi",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Salah",
+     "club": "TS",
+     "points": 4
+    },
+    {
+     "name": "Shomu",
+     "club": "BFK",
+     "points": 2
+    },
+    {
+     "name": "Onuachu",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Oh",
+     "club": "BJK",
+     "points": 5
+    }
+   ],
+   "bench": [
+    {
+     "name": "Victor",
+     "club": "ALY",
+     "points": 1
+    },
+    {
+     "name": "Operi",
+     "club": "BFK",
+     "points": -1
+    },
+    {
+     "name": "Mendes",
+     "club": "SAM",
+     "points": 0
+    },
+    {
+     "name": "Emrecan",
+     "club": "ÇRS",
+     "points": 8
+    }
+   ]
+  },
+  "Serdar Ekinci": {
+   "mh": 41,
+   "nostradamus": 0,
+   "card": null,
+   "captain": "Osimhen",
+   "vice": "Gökhan",
+   "multiplier": 2,
+   "xi": [
+    {
+     "name": "Uğurcan",
+     "club": "GS",
+     "points": 8
+    },
+    {
+     "name": "Škriniar",
+     "club": "FB",
+     "points": 8
+    },
+    {
+     "name": "Cabral",
+     "club": "TS",
+     "points": 1
+    },
+    {
+     "name": "Arda",
+     "club": "GÖZ",
+     "points": 0
+    },
+    {
+     "name": "Gökhan",
+     "club": "ÇRM",
+     "points": 8
+    },
+    {
+     "name": "Guendouzi",
+     "club": "FB",
+     "points": 3
+    },
+    {
+     "name": "Muçi",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Aral",
+     "club": "TS",
+     "points": 1
+    },
+    {
+     "name": "Sané",
+     "club": "GS",
+     "points": 1
+    },
+    {
+     "name": "Trossard",
+     "club": "BJK",
+     "points": 9
+    },
+    {
+     "name": "Muriqi",
+     "club": "FB",
+     "points": 0
+    }
+   ],
+   "bench": [
+    {
+     "name": "Muhammed",
+     "club": "BFK",
+     "points": 0
+    },
+    {
+     "name": "Thiam",
+     "club": "ÇRM",
+     "points": 0
+    },
+    {
+     "name": "Uduokhai",
+     "club": "BJK",
+     "points": 0
+    },
+    {
+     "name": "Osimhen",
+     "club": "GS",
+     "points": 0
+    }
+   ]
+  },
+  "avengers": {
+   "mh": 38,
+   "nostradamus": 3,
+   "card": null,
+   "captain": "Osimhen",
+   "vice": "Greenwood",
+   "multiplier": 2,
+   "xi": [
+    {
+     "name": "Onana",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Aliti",
+     "club": "ALY",
+     "points": 1
+    },
+    {
+     "name": "Hadërgjonaj",
+     "club": "ALY",
+     "points": 1
+    },
+    {
+     "name": "Sánchez",
+     "club": "GS",
+     "points": 8
+    },
+    {
+     "name": "Sallai",
+     "club": "GS",
+     "points": 5
+    },
+    {
+     "name": "Salah",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Emrecan",
+     "club": "ÇRS",
+     "points": 8
+    },
+    {
+     "name": "Greenwood",
+     "club": "FB",
+     "points": 6
+    },
+    {
+     "name": "Muçi",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Oğuz",
+     "club": "FB",
+     "points": 0
+    },
+    {
+     "name": "Osimhen",
+     "club": "GS",
+     "points": 0
+    }
+   ],
+   "bench": [
+    {
+     "name": "Deniz",
+     "club": "KNY",
+     "points": 0
+    },
+    {
+     "name": "Rıdvan",
+     "club": "BJK",
+     "points": 0
+    },
+    {
+     "name": "Arda",
+     "club": "ALY",
+     "points": 0
+    },
+    {
+     "name": "Vlahović",
+     "club": "BJK",
+     "points": 0
+    }
+   ]
+  },
+  "Mxscyn": {
+   "mh": 33,
+   "nostradamus": 0,
+   "card": null,
+   "captain": "Osimhen",
+   "vice": "Koïta",
+   "multiplier": 2,
+   "xi": [
+    {
+     "name": "Uğurcan",
+     "club": "GS",
+     "points": 8
+    },
+    {
+     "name": "Mendes",
+     "club": "SAM",
+     "points": 0
+    },
+    {
+     "name": "Lima",
+     "club": "ALY",
+     "points": 0
+    },
+    {
+     "name": "Jules",
+     "club": "EYP",
+     "points": 1
+    },
+    {
+     "name": "Haïdara",
+     "club": "KS",
+     "points": 2
+    },
+    {
+     "name": "Dia Saba",
+     "club": "AMD",
+     "points": 3
+    },
+    {
+     "name": "Salah",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Yunus",
+     "club": "GS",
+     "points": 3
+    },
+    {
+     "name": "Cerny",
+     "club": "BJK",
+     "points": 3
+    },
+    {
+     "name": "Koïta",
+     "club": "GB",
+     "points": 2
+    },
+    {
+     "name": "Benedyczak",
+     "club": "KSP",
+     "points": 9
+    }
+   ],
+   "bench": [
+    {
+     "name": "Onana",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Osimhen",
+     "club": "GS",
+     "points": 0
+    },
+    {
+     "name": "Greenwood",
+     "club": "FB",
+     "points": 3
+    },
+    {
+     "name": "Hadërgjonaj",
+     "club": "ALY",
+     "points": 1
+    }
+   ]
+  },
+  "ÖFC": {
+   "mh": 31,
+   "nostradamus": 6,
+   "card": null,
+   "captain": "Salah",
+   "vice": "Shomu",
+   "multiplier": 2,
+   "xi": [
+    {
+     "name": "Nübel",
+     "club": "BJK",
+     "points": 6
+    },
+    {
+     "name": "Borza",
+     "club": "ÇRM",
+     "points": 1
+    },
+    {
+     "name": "Lima",
+     "club": "ALY",
+     "points": 0
+    },
+    {
+     "name": "Gökhan",
+     "club": "ÇRM",
+     "points": 4
+    },
+    {
+     "name": "Hadërgjonaj",
+     "club": "ALY",
+     "points": 1
+    },
+    {
+     "name": "Salah",
+     "club": "TS",
+     "points": 4
+    },
+    {
+     "name": "Muçi",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Sara",
+     "club": "GS",
+     "points": 1
+    },
+    {
+     "name": "Olaitan",
+     "club": "BJK",
+     "points": 3
+    },
+    {
+     "name": "Shomu",
+     "club": "BFK",
+     "points": 2
+    },
+    {
+     "name": "Dju",
+     "club": "TS",
+     "points": 1
+    }
+   ],
+   "bench": [
+    {
+     "name": "Muhammed",
+     "club": "BFK",
+     "points": 0
+    },
+    {
+     "name": "Škriniar",
+     "club": "FB",
+     "points": 8
+    },
+    {
+     "name": "Arda",
+     "club": "ALY",
+     "points": 0
+    },
+    {
+     "name": "Greenwood",
+     "club": "FB",
+     "points": 3
+    }
+   ]
+  },
+  "Catenicco": {
+   "mh": 23,
+   "nostradamus": 0,
+   "card": null,
+   "captain": "Osimhen",
+   "vice": "Salah",
+   "multiplier": 2,
+   "xi": [
+    {
+     "name": "İrfan Can",
+     "club": "GB",
+     "points": 1
+    },
+    {
+     "name": "Pereira",
+     "club": "GB",
+     "points": 1
+    },
+    {
+     "name": "Hadërgjonaj",
+     "club": "ALY",
+     "points": 1
+    },
+    {
+     "name": "Pina",
+     "club": "TS",
+     "points": 2
+    },
+    {
+     "name": "Salah",
+     "club": "TS",
+     "points": 4
+    },
+    {
+     "name": "Oğulcan",
+     "club": "GB",
+     "points": 2
+    },
+    {
+     "name": "Laçi",
+     "club": "ÇRS",
+     "points": 3
+    },
+    {
+     "name": "Greenwood",
+     "club": "FB",
+     "points": 3
+    },
+    {
+     "name": "Dia Saba",
+     "club": "AMD",
+     "points": 3
+    },
+    {
+     "name": "Bertuğ",
+     "club": "BFK",
+     "points": 1
+    },
+    {
+     "name": "Onuachu",
+     "club": "TS",
+     "points": 2
+    }
+   ],
+   "bench": [
+    {
+     "name": "Muhammed",
+     "club": "BFK",
+     "points": 0
+    },
+    {
+     "name": "Osimhen",
+     "club": "GS",
+     "points": 0
+    },
+    {
+     "name": "Sallai",
+     "club": "GS",
+     "points": 5
+    },
+    {
+     "name": "Rıdvan",
+     "club": "BJK",
+     "points": 0
+    }
+   ]
+  }
+ }
+}
