@@ -319,7 +319,6 @@ def load_positions():   # cache YOK: dosya sonradan eklenince hemen gorunsun
     return {}
 
 
-@st.cache_data
 def load_weeks():
     paths = {}
     for d in SEARCH_DIRS:
