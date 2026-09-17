@@ -254,10 +254,33 @@ def pos_of(p) -> str:
 
 
 def formation(xi):
-    """Ilk 11'i pozisyona gore satirlara boler; pozisyon yoksa kadro sirasina duser."""
-    if not all(pos_of(p) for p in xi):
-        return [xi[:1], xi[1:5], xi[5:9], xi[9:]] if len(xi) == 11 else [xi]
-    lines = [[p for p in xi if pos_of(p) == k] for k in POS_ORDER]
+    """Ilk 11'i gercek pozisyonlara gore KL / DEF / OS / FOR satirlarina ayirir.
+
+    Tek bir oyuncunun pozisyonu eksik diye butun kadroyu 1-4-4-2'ye zorlamaz.
+    Eksik pozisyon sadece ekran yerlesimi icin kadro sirasindaki en yakin
+    bilinen pozisyona baglanir; asil oyuncu verisi degistirilmez.
+    """
+    known = [pos_of(p) if pos_of(p) in POS_ORDER else "" for p in xi]
+    resolved = []
+
+    for i, p in enumerate(xi):
+        pos = known[i]
+        if not pos:
+            if i == 0:
+                pos = "KL"
+            else:
+                prev_pos = next((known[j] for j in range(i - 1, -1, -1) if known[j]), "")
+                next_pos = next((known[j] for j in range(i + 1, len(xi)) if known[j]), "")
+
+                # Kaleciden hemen sonraki bilinmeyen oyuncu buyuk ihtimalle DEF satirindadir.
+                if prev_pos == "KL" and next_pos:
+                    pos = next_pos
+                else:
+                    pos = prev_pos or next_pos or "OS"
+
+        resolved.append((p, pos))
+
+    lines = [[p for p, ppos in resolved if ppos == k] for k in POS_ORDER]
     return [ln for ln in lines if ln]
 
 
@@ -296,6 +319,7 @@ def load_positions():   # cache YOK: dosya sonradan eklenince hemen gorunsun
     return {}
 
 
+@st.cache_data
 def load_weeks():
     paths = {}
     for d in SEARCH_DIRS:
@@ -669,9 +693,8 @@ with t3:
         if not POS_FILE:
             pos_warning()
         lines = formation(sq["xi"])
-        has_pos = all(pos_of(p) for p in sq["xi"])
         shape = ("-".join(str(len(ln)) for ln in lines[1:])
-                 if has_pos and len(lines) > 1 else "")
+                 if len(lines) > 1 else "")
         pitch = "".join(f'<div class="row">{"".join(chip(p) for p in ln)}</div>'
                         for ln in lines)
         md((f'<div class="sec">Diziliş {shape}</div>' if shape else '')
