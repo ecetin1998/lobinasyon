@@ -71,6 +71,13 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif}
 .tbl tr:hover td{background:#161d4d}
 .tbl th.on{color:#4ade9f}
 .of{color:#6b74a8;font-size:11px}
+.st{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:800}
+.st-on{background:#14432f;color:#5ef0aa}.st-mid{background:#3d3410;color:#ffd76a}
+.st-off{background:#43181c;color:#ff8f8f}
+.wks{white-space:nowrap}
+.wk{display:inline-block;min-width:20px;height:20px;line-height:20px;border-radius:6px;font-size:10.5px;font-weight:800;text-align:center;margin-right:3px}
+.wk-chg{background:#183166;color:#8fb8ff}.wk-zero{background:#43181c;color:#ff8f8f}
+.wk-first{background:#212960;color:#7d89c9}.wk-na{background:#1a1f4f;color:#4a5599}
 [class^=pz-]{display:inline-block;padding:2px 6px;border-radius:6px;font-size:10px;font-weight:800}
 .pz-KL{background:#4a3a12;color:#ffd76a}.pz-DEF{background:#183166;color:#8fb8ff}
 .pz-OS{background:#14432f;color:#5ef0aa}.pz-FOR{background:#4a1f24;color:#ff8f8f}
@@ -173,6 +180,7 @@ html,body,[class*="css"]{font-family:'Inter',sans-serif}
  .t-pl th:nth-child(13),.t-pl td:nth-child(13){display:none}
 
  .t-card{min-width:520px}
+ .t-act th:nth-child(5),.t-act td:nth-child(5){display:none}
  .t-res td{font-size:12.5px;padding:8px 4px}
 
  /* saha: 4 sutuna dus, kartlar kucul */
@@ -254,33 +262,10 @@ def pos_of(p) -> str:
 
 
 def formation(xi):
-    """Ilk 11'i gercek pozisyonlara gore KL / DEF / OS / FOR satirlarina ayirir.
-
-    Tek bir oyuncunun pozisyonu eksik diye butun kadroyu 1-4-4-2'ye zorlamaz.
-    Eksik pozisyon sadece ekran yerlesimi icin kadro sirasindaki en yakin
-    bilinen pozisyona baglanir; asil oyuncu verisi degistirilmez.
-    """
-    known = [pos_of(p) if pos_of(p) in POS_ORDER else "" for p in xi]
-    resolved = []
-
-    for i, p in enumerate(xi):
-        pos = known[i]
-        if not pos:
-            if i == 0:
-                pos = "KL"
-            else:
-                prev_pos = next((known[j] for j in range(i - 1, -1, -1) if known[j]), "")
-                next_pos = next((known[j] for j in range(i + 1, len(xi)) if known[j]), "")
-
-                # Kaleciden hemen sonraki bilinmeyen oyuncu buyuk ihtimalle DEF satirindadir.
-                if prev_pos == "KL" and next_pos:
-                    pos = next_pos
-                else:
-                    pos = prev_pos or next_pos or "OS"
-
-        resolved.append((p, pos))
-
-    lines = [[p for p, ppos in resolved if ppos == k] for k in POS_ORDER]
+    """Ilk 11'i pozisyona gore satirlara boler; pozisyon yoksa kadro sirasina duser."""
+    if not all(pos_of(p) for p in xi):
+        return [xi[:1], xi[1:5], xi[5:9], xi[9:]] if len(xi) == 11 else [xi]
+    lines = [[p for p in xi if pos_of(p) == k] for k in POS_ORDER]
     return [ln for ln in lines if ln]
 
 
@@ -319,6 +304,7 @@ def load_positions():   # cache YOK: dosya sonradan eklenince hemen gorunsun
     return {}
 
 
+@st.cache_data
 def load_weeks():
     paths = {}
     for d in SEARCH_DIRS:
@@ -410,6 +396,40 @@ def pos_warning():
             var = None
         st.write(f"- `{d}` → " + ("klasör yok" if var is None
                                   else "VAR (okunamadı?)" if var else "yok"))
+
+def squad_activity(weeks):
+    """15 kişilik kadroyu küme olarak karşılaştırır (11/yedek dizilişi önemsiz).
+
+    Dönen her takım için: haftalık giren oyuncu sayısı, son değişiklik haftası,
+    en son kaç hafta üst üste hiç değişmediği ve sezon boyu toplam giren oyuncu.
+    """
+    teams = sorted({t for w in weeks for t in w["teams"]}, key=tr_key)
+    out = {}
+    for t in teams:
+        prev, hist, last_change, streak, total = None, [], None, 0, 0
+        for w in weeks:
+            sq = w["teams"].get(t)
+            if not sq:
+                hist.append((w["week"], None))
+                prev = None
+                continue
+            cur = {(p["name"], p["club"]) for p in sq["xi"] + sq["bench"]}
+            if prev is None:
+                hist.append((w["week"], "ilk"))
+                streak = 0
+            else:
+                n_in = len(cur - prev)
+                hist.append((w["week"], n_in))
+                total += n_in
+                if n_in == 0:
+                    streak += 1
+                else:
+                    streak, last_change = 0, w["week"]
+            prev = cur
+        out[t] = dict(hist=hist, last=last_change, streak=streak, total=total)
+    return out
+
+
 weeks = load_weeks()
 if not weeks:
     st.error("gw*.json dosyası bulunamadı.")
@@ -464,6 +484,10 @@ cap_hit = sum(1 for w in weeks for sq in w["teams"].values()
               == max(p["points"] for p in sq["xi"]))
 cap_tot = sum(len(w["teams"]) for w in weeks)
 cards_used = sum(1 for w in weeks for sq in w["teams"].values() if sq["card"])
+activity = squad_activity(weeks)
+INACTIVE_AT = 2   # üst üste bu kadar hafta hiç değişiklik yoksa inaktif
+inactive = sorted((t for t, a in activity.items() if a["streak"] >= INACTIVE_AT),
+                  key=lambda t: -activity[t]["streak"])
 
 md(f"""<div class="strip">
 <div class="s"><div class="l">Haftanın takımı</div><div class="v">{best_t}</div>
@@ -474,11 +498,14 @@ md(f"""<div class="strip">
 <div class="n">{top_pl[1]['katki']} puan üretti</div></div>
 <div class="s"><div class="l">Kaptan isabeti</div><div class="v">{cap_hit}/{cap_tot}</div>
 <div class="n">%{round(100*cap_hit/cap_tot)} doğru seçim</div></div>
+<div class="s"><div class="l">İnaktif takım</div><div class="v">{len(inactive)}</div>
+<div class="n">{", ".join(inactive[:3]) + (" +" + str(len(inactive)-3) if len(inactive) > 3 else "") if inactive else "herkes aktif"}</div></div>
 <div class="s"><div class="l">Yakılan kart</div><div class="v">{cards_used}</div>
 <div class="n">{NT*PER_TYPE*len(CARD_KEYS)} hakkın içinden</div></div>
 </div>""")
 
-t1, t2, t3, t4, t5 = st.tabs(["PUAN DURUMU", "OYUNCULAR", "TAKIM DETAYI", "KARTLAR", "SONUÇLAR"])
+t1, t2, t3, t4, t6, t5 = st.tabs(["PUAN DURUMU", "OYUNCULAR", "TAKIM DETAYI", "KARTLAR",
+                                   "AKTİFLİK", "SONUÇLAR"])
 
 with t1:
     STD_SORTS = {
@@ -692,8 +719,9 @@ with t3:
         if not POS_FILE:
             pos_warning()
         lines = formation(sq["xi"])
+        has_pos = all(pos_of(p) for p in sq["xi"])
         shape = ("-".join(str(len(ln)) for ln in lines[1:])
-                 if len(lines) > 1 else "")
+                 if has_pos and len(lines) > 1 else "")
         pitch = "".join(f'<div class="row">{"".join(chip(p) for p in ln)}</div>'
                         for ln in lines)
         md((f'<div class="sec">Diziliş {shape}</div>' if shape else '')
@@ -739,6 +767,40 @@ with t4:
                         f'<td class="pz">{sq["mh"]}</td></tr>')
     md('<div class="scroll"><table class="tbl t-log"><tr><th>Hafta</th><th>Takım</th><th>Kart</th>'
                 f'<th>O hafta</th></tr>{log}</table></div>')
+
+with t6:
+    order = sorted(activity.items(),
+                   key=lambda kv: (-kv[1]["streak"], kv[1]["total"], tr_key(kv[0])))
+    rows = ""
+    for t, a in order:
+        if a["streak"] >= INACTIVE_AT:
+            badge = '<span class="st st-off">İnaktif</span>'
+        elif a["streak"] == 1:
+            badge = '<span class="st st-mid">Dikkat</span>'
+        else:
+            badge = '<span class="st st-on">Aktif</span>'
+        chips = ""
+        for wk, v in a["hist"]:
+            if v is None:
+                chips += f'<span class="wk wk-na" title="MH{wk}: kadro yok">–</span>'
+            elif v == "ilk":
+                chips += f'<span class="wk wk-first" title="MH{wk}: ilk kadro">•</span>'
+            elif v == 0:
+                chips += f'<span class="wk wk-zero" title="MH{wk}: değişiklik yok">0</span>'
+            else:
+                chips += f'<span class="wk wk-chg" title="MH{wk}: {v} oyuncu girdi">{v}</span>'
+        last = f"MH{a['last']}" if a["last"] else "hiç"
+        rows += (f'<tr><td class="tm">{t}</td><td>{badge}</td>'
+                 f'<td class="pz">{a["streak"]}</td><td>{last}</td>'
+                 f'<td>{a["total"]}</td><td class="wks">{chips}</td></tr>')
+    heads = "".join(f"<th>MH{w['week']}</th>" for w in weeks)
+    md('<div class="scroll"><table class="tbl t-act"><tr><th>Takım</th><th>Durum</th>'
+       '<th>Değişmeyen hafta</th><th>Son değişiklik</th><th>Toplam giren</th>'
+       f'<th>Haftalık giren oyuncu</th></tr>{rows}</table></div>')
+    st.caption(f"15 kişilik kadro küme olarak karşılaştırılır; 11 ile yedek arasındaki yer "
+               f"değişiklikleri (otomatik değişiklik dahil) sayılmaz. Üst üste {INACTIVE_AT} "
+               "hafta hiç oyuncu girmemişse İnaktif, 1 hafta ise Dikkat. Kutucuklardaki sayı "
+               "o hafta kadroya giren yeni oyuncu sayısı.")
 
 with t5:
     for w in reversed(weeks):
